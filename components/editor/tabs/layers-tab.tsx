@@ -5,7 +5,7 @@ import { useEditor } from "@/contexts/editor-context"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import { ChevronRight, ChevronDown, Eye, EyeOff, Trash2, GripVertical } from "lucide-react"
-import { useState, useRef } from "react"
+import { useState, useRef ,useEffect} from "react"
 import { cn } from "@/lib/utils"
 import type { Element } from "@/contexts/editor-context"
 import { useDrag, useDrop, type XYCoord, useDragLayer } from "react-dnd"
@@ -24,6 +24,7 @@ function LayerItem({ element, level, index, parentId, path }: LayerItemProps) {
   const { state, dispatch } = useEditor()
   const [isExpanded, setIsExpanded] = useState(true)
   const ref = useRef<HTMLDivElement>(null)
+  const previewRef = useRef<HTMLDivElement>(null)
   const monitor = useDragLayer((monitor) => ({
     item: monitor.getItem(),
     isDragging: monitor.isDragging(),
@@ -207,10 +208,14 @@ function LayerItem({ element, level, index, parentId, path }: LayerItemProps) {
   const dropTargetType = ref.current?.dataset.dropTargetType
   const showNestIndicator = isOverCurrent && dropTargetType === "nest"
   const showReorderIndicator = isOverCurrent && dropTargetType === "reorder"
-
+useEffect(() => {
+  if (previewRef.current) {
+    dragPreview(previewRef)
+  }
+}, [dragPreview])
   return (
     <div
-      ref={dragPreview} // Use dragPreview for the outer div to avoid conflicts with the drag handle
+      ref={previewRef} // Use dragPreview for the outer div to avoid conflicts with the drag handle
       className={cn("group relative", isDragging && "opacity-30")}
     >
       {showReorderIndicator && (

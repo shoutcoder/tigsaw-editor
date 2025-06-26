@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-
+import { useRef,useEffect } from "react"
 import { useDrag } from "react-dnd"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
@@ -297,11 +297,19 @@ function DraggableElement({ elementType }: { elementType: ElementType }) {
     }),
   }))
 
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (ref.current) {
+      drag(ref)
+    }
+  }, [ref, drag])
+
   const Icon = elementType.icon
 
   return (
     <div
-      ref={drag}
+      ref={ref}
       className={`group p-3 border border-gray-200 rounded-lg cursor-move hover:bg-gray-50 hover:border-blue-300 transition-all ${
         isDragging ? "opacity-50 scale-95" : ""
       }`}

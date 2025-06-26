@@ -7,10 +7,12 @@ import { useEditor } from "@/contexts/editor-context"
 import { RenderElement } from "./render-element"
 import { cn } from "@/lib/utils"
 import { generateId } from "@/lib/utils"
+import { useEffect,useRef } from "react"
 
 // Root level drop indicator
 function RootDropIndicator({ position, index }: { position: "top" | "bottom"; index: number }) {
   const { state, dispatch } = useEditor()
+  const dropRef = useRef<HTMLDivElement>(null)
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ["dragging-element", "element"],
@@ -53,7 +55,11 @@ function RootDropIndicator({ position, index }: { position: "top" | "bottom"; in
       canDrop: monitor.canDrop(),
     }),
   }))
-
+useEffect(() => {
+  if (dropRef.current) {
+    drop(dropRef)
+  }
+}, [drop])
   // Show when something is being dragged
   const shouldShow = state.editingMode === "editing" && (state.draggedElement || canDrop)
 
@@ -61,7 +67,7 @@ function RootDropIndicator({ position, index }: { position: "top" | "bottom"; in
 
   return (
     <div
-      ref={drop}
+      ref={dropRef}
       className={cn("relative w-full transition-all duration-150 flex-shrink-0 z-10", isOver ? "h-2" : "h-1")}
       style={{
         minHeight: "8px",
@@ -105,7 +111,7 @@ function RootDropIndicator({ position, index }: { position: "top" | "bottom"; in
 
 export function Canvas() {
   const { state, dispatch } = useEditor()
-
+const cavRef = useRef<HTMLDivElement>(null)
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "element",
     drop: (item: any, monitor) => {
@@ -153,12 +159,18 @@ export function Canvas() {
       dispatch({ type: "SELECT_ELEMENT", payload: { id: null } })
     }
   }
+  
+  useEffect(() => {
+  if (cavRef.current) {
+    drop(cavRef)
+  }
+}, [drop])
 
   return (
     <div className="h-full bg-gray-100 overflow-auto">
       <div className="flex justify-center p-8">
         <div
-          ref={drop}
+          ref={cavRef}
           onClick={handleCanvasClick}
           data-canvas="true"
           className={cn(

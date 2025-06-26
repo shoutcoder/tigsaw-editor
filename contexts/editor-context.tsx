@@ -223,34 +223,39 @@ function updateElementStylesInTree(
 }
 
 function deleteElementFromTree(elements: Element[], id: string): Element[] {
-  return elements.filter((element) => {
+  return elements.map((element) => {
     if (element.id === id) {
-      return false
+      return null // Mark for removal
     }
     if (element.children && element.children.length > 0) {
-      element.children = deleteElementFromTree(element.children, id)
+      const updatedChildren = deleteElementFromTree(element.children, id)
+      return { ...element, children: updatedChildren }
     }
-    return true
-  })
+    return element
+  }).filter(Boolean) as Element[] // Remove null elements
 }
 
 function removeElementFromTree(elements: Element[], id: string): { elements: Element[]; element: Element | null } {
   let removedElement: Element | null = null
 
-  const newElements = elements.filter((element) => {
+  const newElements = elements.map((element) => {
     if (element.id === id) {
       removedElement = element
-      return false
+      return null // Mark for removal
     }
     if (element.children && element.children.length > 0) {
       const result = removeElementFromTree(element.children, id)
-      element.children = result.elements
       if (result.element) {
         removedElement = result.element
       }
+      // Return a new element with updated children (immutable)
+      return {
+        ...element,
+        children: result.elements
+      }
     }
-    return true
-  })
+    return element
+  }).filter(Boolean) as Element[] // Remove null elements
 
   return { elements: newElements, element: removedElement }
 }
@@ -297,6 +302,7 @@ function addToHistory(state: EditorState): EditorState {
 function editorReducer(state: EditorState, action: EditorAction): EditorState {
   switch (action.type) {
     case "ADD_ELEMENT": {
+      console.log("🚀 ADD_ELEMENT dispatched:", action.payload)
       const newState = addToHistory(state)
       const { element, parentId, index } = action.payload
 
@@ -337,6 +343,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
     }
 
     case "DELETE_ELEMENT": {
+      console.log("🚀 DELETE_ELEMENT dispatched:", action.payload)
       const newState = addToHistory(state)
       return {
         ...newState,
@@ -346,6 +353,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
     }
 
     case "SELECT_ELEMENT":
+      console.log("🚀 SELECT_ELEMENT dispatched:", action.payload)
       return {
         ...state,
         selectedElement: action.payload.id,
@@ -372,19 +380,42 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
       }
 
     case "MOVE_ELEMENT": {
+      console.log("🚀 MOVE_ELEMENT dispatched:", action.payload)
       const newState = addToHistory(state)
       const { elementId, newParentId, index } = action.payload
+
+      // Validate elementId exists
+      if (!elementId) {
+        console.error("❌ MOVE_ELEMENT: elementId is required")
+        return newState
+      }
+
+      // Prevent moving element to itself or its children to avoid infinite loops
+      if (elementId === newParentId) {
+        console.error("❌ MOVE_ELEMENT: Cannot move element to itself")
+        return newState
+      }
 
       // Remove element from current position
       const { elements: elementsAfterRemoval, element } = removeElementFromTree(newState.elements, elementId)
 
-      if (!element) return newState
+      if (!element) {
+        console.error("❌ MOVE_ELEMENT: Element not found with id:", elementId)
+        return newState
+      }
 
-      // Update element's parent reference
-      const updatedElement = { ...element, parent: newParentId }
+      console.log("✅ Element found and removed:", element.id)
+
+      // Update element's parent reference (only set if newParentId is provided)
+      const updatedElement = { 
+        ...element, 
+        parent: newParentId || undefined // Clear parent if moving to root
+      }
 
       // Insert element at new position
       const newElements = insertElementInTree(elementsAfterRemoval, updatedElement, newParentId, index)
+
+      console.log("✅ Element moved successfully")
 
       return {
         ...newState,

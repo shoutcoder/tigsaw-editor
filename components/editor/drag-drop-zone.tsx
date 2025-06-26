@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-
+import { useRef,useEffect } from "react"
 import { useDrop } from "react-dnd"
 import { useEditor } from "@/contexts/editor-context"
 import { cn } from "@/lib/utils"
@@ -16,7 +16,7 @@ interface DragDropZoneProps {
 
 export function DragDropZone({ parentId, children, className, minHeight = "60px" }: DragDropZoneProps) {
   const { state, dispatch } = useEditor()
-
+const dropRef = useRef<HTMLDivElement>(null)
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ["element", "layer"],
     drop: (item: any, monitor) => {
@@ -60,9 +60,15 @@ export function DragDropZone({ parentId, children, className, minHeight = "60px"
     }),
   }))
 
+  useEffect(() => {
+  if (dropRef.current) {
+    drop(dropRef)
+  }
+}, [drop])
+
   return (
     <div
-      ref={drop}
+      ref={dropRef}
       className={cn(
         "relative transition-all duration-200",
         isOver &&

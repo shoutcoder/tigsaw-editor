@@ -125,7 +125,9 @@ function DropIndicator({ position, parentId, index }: DropIndicatorProps) {
 
   return (
     <div
-      ref={drop}
+      ref={(node) => {
+        drop(node)
+      }}
       className={cn("relative w-full transition-all duration-150 flex-shrink-0 z-10", isOver ? "h-3" : "h-1")}
       style={{
         minHeight: "12px", // Increase drop zone size
@@ -448,7 +450,7 @@ export function RenderElement({ element, parentId, index = 0 }: RenderElementPro
 
   const elementProps: any = {
     ref: (node: HTMLElement | null) => {
-      elementRef.current = node
+      // Avoid assigning to .current if it's readonly, just use node directly
       if (node) {
         drop(node)
       }
@@ -522,7 +524,6 @@ export function RenderElement({ element, parentId, index = 0 }: RenderElementPro
 
         <div
           ref={(node) => {
-            dragHandleRef.current = node
             if (node) {
               console.log("Connecting drag to handle for element:", element.id)
               drag(node)
@@ -590,6 +591,7 @@ export function RenderElement({ element, parentId, index = 0 }: RenderElementPro
         </head>
         <body>
           ${element.content || ""}
+        
         </body>
       </html>
     `

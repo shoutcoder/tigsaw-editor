@@ -402,6 +402,184 @@ function createDefaultHeroBanner(): Element[] {
     },
   ]
 }
+// function createDefaultHeroBanner(): Element[] {
+//   const popupId = "valentineOfferPopup9173"
+//   const closeBtnId = "closeValentineOfferBtn9173"
+//   const imageId = generateId()
+//   const pretitleId = generateId()
+//   const titleId = generateId()
+//   const contentContainerId = generateId()
+
+//   return [
+//     {
+//       id: popupId,
+//       type: "popup",
+//       tag: "div",
+//       content: undefined,
+//       styles: {
+//         desktop: {
+//           position: "fixed",
+//           bottom: "20px",
+//           left: "50%",
+//           transform: "translateX(-50%) translateX(-110%)",
+//           width: "calc(100% - 40px)",
+//           maxWidth: "380px",
+//           backgroundColor: "#ffffff",
+//           border: "2px solid #ffc2d1",
+//           borderRadius: "16px",
+//           boxShadow: "0 10px 30px rgba(255, 105, 180, 0.2)",
+//           textAlign: "center",
+//           padding: "25px 20px 20px",
+//           zIndex: 1000,
+//           opacity: 0,
+//           transition: "opacity 0.6s ease-out, transform 0.8s cubic-bezier(0.19, 1, 0.22, 1)",
+//           boxSizing: "border-box",
+//         },
+//         tablet: {
+//           left: "25px",
+//           transform: "translateX(-110%)",
+//         },
+//         mobile: {},
+//       },
+//       attributes: {
+//         class: "cu-offer-popup-valentine-9173",
+//         "data-date": "2025-08-14T23:59:00",
+//       },
+//       children: [
+//         {
+//           id: closeBtnId,
+//           type: "button",
+//           tag: "button",
+//           content: "×",
+//           styles: {
+//             desktop: {
+//               position: "absolute",
+//               top: "10px",
+//               right: "10px",
+//               background: "none",
+//               color: "#e91e63",
+//               border: "none",
+//               fontSize: "20px",
+//               cursor: "pointer",
+//               padding: "5px",
+//               transition: "color 0.2s",
+//               lineHeight: "1",
+//             },
+//           },
+//           attributes: {
+//             class: "cu-offer-popup-valentine-9173-close",
+//             "aria-label": "Close offer",
+//           },
+//           children: [],
+//           states: {
+//             default: {
+//               styles: {},
+//               content: "×",
+//               visible: true,
+//             },
+//             hover: {
+//               styles: {
+//                 color: "#c2185b",
+//               },
+//             },
+//           },
+//           currentState: "default",
+//         },
+//         {
+//           id: contentContainerId,
+//           type: "container",
+//           tag: "div",
+//           content: undefined,
+//           styles: {
+//             desktop: {
+//               display: "flex",
+//               flexDirection: "column",
+//               alignItems: "center",
+//             },
+//           },
+//           attributes: {
+//             class: "cu-offer-popup-valentine-9173-content",
+//           },
+//           children: [
+//             {
+//               id: imageId,
+//               type: "image",
+//               tag: "img",
+//               content: undefined,
+//               styles: {
+//                 desktop: {
+//                   maxWidth: "100px",
+//                   width: "100%",
+//                   marginBottom: "15px",
+//                 },
+//                 tablet: {
+//                   maxWidth: "120px",
+//                   marginBottom: "20px",
+//                 },
+//               },
+//               attributes: {
+//                 src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3...",
+//                 alt: "Valentine's gift with hearts",
+//                 class: "cu-offer-popup-valentine-9173-image",
+//               },
+//               children: [],
+//             },
+//             {
+//               id: pretitleId,
+//               type: "text",
+//               tag: "p",
+//               content: "Spread The Love",
+//               styles: {
+//                 desktop: {
+//                   fontSize: "0.85rem",
+//                   color: "#d81b60",
+//                   fontWeight: "700",
+//                   marginBottom: "6px",
+//                   letterSpacing: "0.5px",
+//                 },
+//               },
+//               attributes: {
+//                 class: "cu-offer-popup-valentine-9173-pretitle",
+//               },
+//               children: [],
+//             },
+//             {
+//               id: titleId,
+//               type: "heading",
+//               tag: "h2",
+//               content: "Valentine's Specials",
+//               styles: {
+//                 desktop: {
+//                   fontFamily: "Playfair Display, serif",
+//                   fontSize: "1.7rem",
+//                   fontWeight: "700",
+//                   color: "#ad1457",
+//                   marginBottom: "10px",
+//                   lineHeight: "1.2",
+//                 },
+//                 tablet: {
+//                   fontSize: "1.9rem",
+//                 },
+//               },
+//               attributes: {
+//                 class: "cu-offer-popup-valentine-9173-title",
+//               },
+//               children: [],
+//             },
+//           ],
+//         },
+//       ],
+//       states: {
+//         default: {
+//           styles: {},
+//           visible: true,
+//         },
+//       },
+//       currentState: "default",
+//     },
+//   ]
+// }
+
 
 /**
  * Imports an existing design from HTML, CSS, and JS strings into the editor's element structure.
