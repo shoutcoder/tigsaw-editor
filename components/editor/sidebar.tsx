@@ -1,67 +1,136 @@
-"use client"
-import { ElementsTab } from "./tabs/elements-tab"
-import { LayersTab } from "./tabs/layers-tab"
-import { InteractionsTab } from "./tabs/interactions-tab"
-import { AssetsTab } from "./tabs/assets-tab"
-import { GlobalJsTab } from "./tabs/global-js-tab"
-import { Layers, Plus, Zap, ImageIcon, HelpCircle, Code } from "lucide-react"
-import { useEditor } from "@/contexts/editor-context"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-
+"use client";
+import { ElementsTab } from "./tabs/elements-tab";
+import { LayersTab } from "./tabs/layers-tab";
+import { InteractionsTab } from "./tabs/interactions-tab";
+import { AssetsTab } from "./tabs/assets-tab";
+import { GlobalJsTab } from "./tabs/global-js-tab";
+import {
+  Layers,
+  Plus,
+  Zap,
+  ImageIcon,
+  HelpCircle,
+  Code,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { SetStateAction, useState } from "react";
+interface SidebarProps {
+  isExpanded: boolean;
+  onToggle: () => void;
+}
 const tabConfig = [
   { value: "elements", label: "Add", icon: Plus },
   { value: "layers", label: "Layers", icon: Layers },
-  // Styles tab is now in its own panel
   { value: "interactions", label: "Actions", icon: Zap },
   { value: "assets", label: "Assets", icon: ImageIcon },
-  { value: "globaljs", label: "JS", icon: Code }, // Add this line
-]
+  { value: "globaljs", label: "JS", icon: Code },
+];
 
-export function Sidebar() {
-  const { state, dispatch } = useEditor()
+export function Sidebar({ isExpanded, onToggle }: SidebarProps) {
+  const [activeTab, setActiveTab] = useState("elements");
+  const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
+
+  const handleTabChange = (tabValue: string) => {
+    if (activeTab === tabValue && isExpanded) {
+      onToggle();
+    } else {
+      setActiveTab(tabValue);
+    }
+    if (activeTab !== tabValue && !isExpanded) {
+      onToggle();
+    } else {
+      setActiveTab(tabValue);
+    }
+  };
+
+  const activeTabConfig = tabConfig.find((tab) => tab.value === activeTab);
 
   return (
-    <div className="h-full flex flex-row">
-      {/* Vertical Icon Tabs List */}
-      <div className="w-16 bg-gray-50 border-r border-gray-200 flex flex-col items-center py-4 space-y-1 shrink-0">
-        {tabConfig.map((tab) => (
-          <Button
-            key={tab.value}
-            variant="ghost"
-            className={cn(
-              "w-12 h-12 flex flex-col items-center justify-center p-0 rounded-lg",
-              state.activeTab === tab.value
-                ? "bg-blue-100 text-blue-600"
-                : "text-gray-500 hover:bg-gray-100 hover:text-gray-700",
-            )}
-            onClick={() => dispatch({ type: "SET_ACTIVE_TAB", payload: { tab: tab.value as any } })}
-            title={tab.label}
-          >
-            <tab.icon className="w-5 h-5" />
-            <span className="text-[10px] mt-0.5">{tab.label}</span>
-          </Button>
-        ))}
-        <div className="flex-grow" /> {/* Spacer */}
+    <div
+      className={`h-full flex pl-3 flex-row bg-[#F0F0F0] border-r border-gray-200 gap-2 `}
+    >
+      {/* Left Icon Panel */}
+      <div className="bg-white border-r border-gray-200 flex flex-col items-center py-6 w-16 shrink-0 rounded-tl-2xl rounded-bl-2xl">
+        {/* Toggle Button at the top */}
         <Button
           variant="ghost"
-          className="w-12 h-12 flex flex-col items-center justify-center p-0 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          size="sm"
+          onClick={onToggle}
+          className="p-1 h-8 w-8 mb-4 text-gray-600 hover:bg-gray-200 rounded-[6px]"
+        >
+          {isExpanded ? (
+            <ChevronLeft className="w-4 h-4" />
+          ) : (
+            <ChevronRight className="w-4 h-4" />
+          )}
+        </Button>
+
+        <div className="flex flex-col items-center gap-4">
+          {tabConfig.map((tab) => (
+            <div
+              key={tab.value}
+              className="flex flex-col justify-center items-center gap-1.5"
+            >
+              <Button
+                variant="ghost"
+                className={cn(
+                  "flex flex-col h-7 w-7 items-center justify-center p-2 rounded-[6px] transition-colors",
+                  activeTab === tab.value
+                    ? "bg-gray-900 text-white hover:bg-black hover:text-white shadow-sm"
+                    : "text-[#45556C] border hover:bg-gray-100 hover:text-gray-700"
+                )}
+                onClick={() => handleTabChange(tab.value)}
+                title={tab.label}
+              >
+                <tab.icon size={32} />
+              </Button>
+              <span className="text-[9px] font-medium leading-tight">
+                {tab.label}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex-grow" />
+
+        <Button
+          variant="ghost"
+          className="w-14 h-14 flex flex-col items-center justify-center p-2 rounded-xl text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
           title="Help"
         >
-          <HelpCircle className="w-5 h-5" />
-          <span className="text-[10px] mt-0.5">Help</span>
+          <HelpCircle className="w-5 h-5 mb-1" />
+          <span className="text-[9px] font-medium leading-tight">Help</span>
         </Button>
       </div>
 
-      {/* Tab Content Area */}
-      <div className="flex-1 overflow-hidden bg-white">
-        {state.activeTab === "elements" && <ElementsTab />}
-        {state.activeTab === "layers" && <LayersTab />}
-        {state.activeTab === "interactions" && <InteractionsTab />}
-        {state.activeTab === "assets" && <AssetsTab />}
-        {state.activeTab === "globaljs" && <GlobalJsTab />}
-        {/* StylesTab is no longer here */}
-      </div>
+      {/* Main Content Area */}
+      {isRightPanelOpen && (
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Header with Tab Title */}
+          <div className="flex items-center justify-between p-4 border-b Logo GRED border-gray-200 bg-gray-50">
+            {activeTabConfig && (
+              <div className="flex items-center gap-2">
+                <activeTabConfig.icon className="w-4 h-4 text-gray-700" />
+                <h2 className="font-medium text-gray-900">
+                  {activeTabConfig.label}
+                </h2>
+              </div>
+            )}
+          </div>
+
+          {/* Tab Content */}
+          <div className="flex-1 overflow-auto bg-white">
+            {activeTab === "elements" && <ElementsTab />}
+            {activeTab === "layers" && <LayersTab />}
+            {activeTab === "interactions" && <InteractionsTab />}
+            {activeTab === "assets" && <AssetsTab />}
+            {activeTab === "globaljs" && <GlobalJsTab />}
+          </div>
+        </div>
+      )}
     </div>
-  )
+  );
 }

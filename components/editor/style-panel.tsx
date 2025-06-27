@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { StylesTab } from "./tabs/styles-tab"
-import { useEditor } from "@/contexts/editor-context"
-import { Palette } from "lucide-react"
+import { StylesTab } from "./tabs/styles-tab";
+import { useEditor } from "@/contexts/editor-context";
+import { Palette } from "lucide-react";
 
 export function StylePanel() {
-  const { state } = useEditor()
+  const { state } = useEditor();
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full overflow-y-auto mr-4 ">
       {state.selectedElement ? (
         <StylesTab />
       ) : (
@@ -20,5 +20,5 @@ export function StylePanel() {
         </div>
       )}
     </div>
-  )
+  );
 }

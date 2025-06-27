@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useRef,useEffect } from "react"
-import { useDrag } from "react-dnd"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import type React from "react";
+import { useRef, useEffect } from "react";
+import { useDrag } from "react-dnd";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Square,
   Type,
@@ -19,17 +19,17 @@ import {
   Box,
   Code,
   Video,
-} from "lucide-react"
-import { Separator } from "@/components/ui/separator"
+} from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 interface ElementType {
-  type: string
-  label: string
-  icon: React.ComponentType<any>
-  tag: string
-  defaultStyles: Record<string, any>
-  defaultContent?: string
-  category: string
+  type: string;
+  label: string;
+  icon: React.ComponentType<any>;
+  tag: string;
+  defaultStyles: Record<string, any>;
+  defaultContent?: string;
+  category: string;
 }
 
 const elementTypes: ElementType[] = [
@@ -239,7 +239,8 @@ const elementTypes: ElementType[] = [
       minHeight: "50px",
       border: "2px dashed #d1d5db",
     },
-    defaultContent: "<!-- Your HTML here -->\n<p>This is a custom HTML block. Edit the code in the Styles panel.</p>",
+    defaultContent:
+      "<!-- Your HTML here -->\n<p>This is a custom HTML block. Edit the code in the Styles panel.</p>",
   },
 
   // Navigation Elements
@@ -286,7 +287,7 @@ const elementTypes: ElementType[] = [
       color: "#374151",
     },
   },
-]
+];
 
 function DraggableElement({ elementType }: { elementType: ElementType }) {
   const [{ isDragging }, drag] = useDrag(() => ({
@@ -295,17 +296,17 @@ function DraggableElement({ elementType }: { elementType: ElementType }) {
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
-  }))
+  }));
 
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (ref.current) {
-      drag(ref)
+      drag(ref);
     }
-  }, [ref, drag])
+  }, [ref, drag]);
 
-  const Icon = elementType.icon
+  const Icon = elementType.icon;
 
   return (
     <div
@@ -319,16 +320,18 @@ function DraggableElement({ elementType }: { elementType: ElementType }) {
           <Icon className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
         </div>
         <div>
-          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{elementType.label}</span>
+          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+            {elementType.label}
+          </span>
           <p className="text-xs text-gray-500 mt-0.5">{elementType.tag}</p>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export function ElementsTab() {
-  const categories = Array.from(new Set(elementTypes.map((el) => el.category)))
+  const categories = Array.from(new Set(elementTypes.map((el) => el.category)));
 
   return (
     <div className="p-4">
@@ -337,19 +340,26 @@ export function ElementsTab() {
         <div className="space-y-6">
           {categories.map((category) => (
             <div key={category}>
-              <h4 className="text-xs font-medium text-gray-600 mb-3 uppercase tracking-wide">{category}</h4>
+              <h4 className="text-xs font-medium text-gray-600 mb-3 uppercase tracking-wide">
+                {category}
+              </h4>
               <div className="space-y-2">
                 {elementTypes
                   .filter((el) => el.category === category)
                   .map((elementType) => (
-                    <DraggableElement key={elementType.type} elementType={elementType} />
+                    <DraggableElement
+                      key={elementType.type}
+                      elementType={elementType}
+                    />
                   ))}
               </div>
-              {category !== categories[categories.length - 1] && <Separator className="mt-4" />}
+              {category !== categories[categories.length - 1] && (
+                <Separator className="mt-4" />
+              )}
             </div>
           ))}
         </div>
       </ScrollArea>
     </div>
-  )
+  );
 }
