@@ -34,12 +34,12 @@ export function Sidebar({ isExpanded, onToggle }: SidebarProps) {
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
 
   const handleTabChange = (tabValue: string) => {
-    if (activeTab === tabValue && isExpanded) {
-      onToggle();
-    } else {
-      setActiveTab(tabValue);
-    }
     if (activeTab !== tabValue && !isExpanded) {
+      onToggle();
+      setActiveTab(tabValue);
+      return;
+    }
+    if (activeTab === tabValue) {
       onToggle();
     } else {
       setActiveTab(tabValue);
@@ -49,11 +49,9 @@ export function Sidebar({ isExpanded, onToggle }: SidebarProps) {
   const activeTabConfig = tabConfig.find((tab) => tab.value === activeTab);
 
   return (
-    <div
-      className={`h-full flex pl-3 flex-row bg-[#F0F0F0] border-r border-gray-200 gap-2 `}
-    >
+    <div className={`h-full flex pl-3 flex-row bg-[#F0F0F0] gap-3 `}>
       {/* Left Icon Panel */}
-      <div className="bg-white border-r border-gray-200 flex flex-col items-center py-6 w-16 shrink-0 rounded-tl-2xl rounded-bl-2xl">
+      <div className="bg-white flex flex-col items-center py-6 w-16 shrink-0 rounded-tl-2xl rounded-bl-2xl">
         {/* Toggle Button at the top */}
         <Button
           variant="ghost"
@@ -71,8 +69,9 @@ export function Sidebar({ isExpanded, onToggle }: SidebarProps) {
         <div className="flex flex-col items-center gap-4">
           {tabConfig.map((tab) => (
             <div
+              onClick={() => handleTabChange(tab.value)}
               key={tab.value}
-              className="flex flex-col justify-center items-center gap-1.5"
+              className="flex flex-col justify-center items-center gap-1.5 cursor-pointer"
             >
               <Button
                 variant="ghost"
@@ -80,9 +79,8 @@ export function Sidebar({ isExpanded, onToggle }: SidebarProps) {
                   "flex flex-col h-7 w-7 items-center justify-center p-2 rounded-[6px] transition-colors",
                   activeTab === tab.value
                     ? "bg-gray-900 text-white hover:bg-black hover:text-white shadow-sm"
-                    : "text-[#45556C] border hover:bg-gray-100 hover:text-gray-700"
+                    : "text-[#45556C]   hover:text-gray-700"
                 )}
-                onClick={() => handleTabChange(tab.value)}
                 title={tab.label}
               >
                 <tab.icon size={32} />
@@ -108,13 +106,13 @@ export function Sidebar({ isExpanded, onToggle }: SidebarProps) {
 
       {/* Main Content Area */}
       {isRightPanelOpen && (
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden  bg-white  rounded-tr-2xl rounded-br-2xl">
           {/* Header with Tab Title */}
-          <div className="flex items-center justify-between p-4 border-b Logo GRED border-gray-200 bg-gray-50">
+          <div className="flex items-center justify-between  p-3 pt-4 mb-4 border-b border-[#FE784E] mx-2">
             {activeTabConfig && (
               <div className="flex items-center gap-2">
-                <activeTabConfig.icon className="w-4 h-4 text-gray-700" />
-                <h2 className="font-medium text-gray-900">
+                <activeTabConfig.icon className="w-4 h-4 font-semibold  text-gray-700" />
+                <h2 className="font-semibold text-gray-900">
                   {activeTabConfig.label}
                 </h2>
               </div>

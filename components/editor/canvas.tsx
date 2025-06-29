@@ -1,23 +1,29 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useDrop } from "react-dnd"
-import { useEditor } from "@/contexts/editor-context"
-import { RenderElement } from "./render-element"
-import { cn } from "@/lib/utils"
-import { generateId } from "@/lib/utils"
-import { useEffect,useRef } from "react"
+import { useDrop } from "react-dnd";
+import { useEditor } from "@/contexts/editor-context";
+import { RenderElement } from "./render-element";
+import { cn } from "@/lib/utils";
+import { generateId } from "@/lib/utils";
+import { useEffect, useRef } from "react";
 
 // Root level drop indicator
-function RootDropIndicator({ position, index }: { position: "top" | "bottom"; index: number }) {
-  const { state, dispatch } = useEditor()
-  const dropRef = useRef<HTMLDivElement>(null)
+function RootDropIndicator({
+  position,
+  index,
+}: {
+  position: "top" | "bottom";
+  index: number;
+}) {
+  const { state, dispatch } = useEditor();
+  const dropRef = useRef<HTMLDivElement>(null);
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ["dragging-element", "element"],
     drop: (item: any) => {
-      const targetIndex = position === "top" ? index : index + 1
+      const targetIndex = position === "top" ? index : index + 1;
 
       if (item.elementId) {
         // Moving existing element
@@ -28,7 +34,7 @@ function RootDropIndicator({ position, index }: { position: "top" | "bottom"; in
             newParentId: undefined, // Root level
             index: targetIndex,
           },
-        })
+        });
       } else if (item.elementType) {
         // Adding new element
         const newElement = {
@@ -40,35 +46,44 @@ function RootDropIndicator({ position, index }: { position: "top" | "bottom"; in
             desktop: { ...item.elementType.defaultStyles },
           },
           attributes:
-            item.elementType.tag === "img" ? { src: "/placeholder.svg?height=200&width=400", alt: "Placeholder" } : {},
+            item.elementType.tag === "img"
+              ? {
+                  src: "/placeholder.svg?height=200&width=400",
+                  alt: "Placeholder",
+                }
+              : {},
           children: [],
-        }
+        };
 
         dispatch({
           type: "ADD_ELEMENT",
           payload: { element: newElement, index: targetIndex },
-        })
+        });
       }
     },
     collect: (monitor) => ({
       isOver: monitor.isOver({ shallow: true }),
       canDrop: monitor.canDrop(),
     }),
-  }))
-useEffect(() => {
-  if (dropRef.current) {
-    drop(dropRef)
-  }
-}, [drop])
+  }));
+  useEffect(() => {
+    if (dropRef.current) {
+      drop(dropRef);
+    }
+  }, [drop]);
   // Show when something is being dragged
-  const shouldShow = state.editingMode === "editing" && (state.draggedElement || canDrop)
+  const shouldShow =
+    state.editingMode === "editing" && (state.draggedElement || canDrop);
 
-  if (!shouldShow) return null
+  if (!shouldShow) return null;
 
   return (
     <div
       ref={dropRef}
-      className={cn("relative w-full transition-all duration-150 flex-shrink-0 z-10", isOver ? "h-2" : "h-1")}
+      className={cn(
+        "relative w-full transition-all duration-150 flex-shrink-0 z-10",
+        isOver ? "h-2" : "h-1"
+      )}
       style={{
         minHeight: "8px",
         margin: "2px 0",
@@ -106,17 +121,17 @@ useEffect(() => {
         </>
       )}
     </div>
-  )
+  );
 }
 
 export function Canvas() {
-  const { state, dispatch } = useEditor()
-const cavRef = useRef<HTMLDivElement>(null)
+  const { state, dispatch } = useEditor();
+  const cavRef = useRef<HTMLDivElement>(null);
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "element",
     drop: (item: any, monitor) => {
       if (!monitor.didDrop()) {
-        const { elementType } = item
+        const { elementType } = item;
         const newElement = {
           id: generateId(),
           type: elementType.type,
@@ -126,67 +141,93 @@ const cavRef = useRef<HTMLDivElement>(null)
             desktop: { ...elementType.defaultStyles },
           },
           attributes:
-            elementType.tag === "img" ? { src: "/placeholder.svg?height=200&width=400", alt: "Placeholder" } : {},
+            elementType.tag === "img"
+              ? {
+                  src: "/placeholder.svg?height=200&width=400",
+                  alt: "Placeholder",
+                }
+              : {},
           children: [],
-        }
+        };
 
         dispatch({
           type: "ADD_ELEMENT",
           payload: { element: newElement },
-        })
+        });
       }
     },
     collect: (monitor) => ({
       isOver: monitor.isOver({ shallow: true }),
     }),
-  }))
+  }));
 
   const getCanvasWidth = () => {
-    switch (state.currentBreakpoint) {
-      case "mobile":
-        return "375px"
-      case "tablet":
-        return "768px"
-      default:
-        return "100%"
+    if (!state.isPreviewMode) {
+      switch (state.currentBreakpoint) {
+        case "mobile":
+          return "375px";
+        case "tablet":
+          return "768px";
+        default:
+          return "100%";
+      }
+    } else {
+      // In preview mode, force responsive simulation
+      switch (state.currentBreakpoint) {
+        case "mobile":
+          return "375px";
+        case "tablet":
+          return "768px";
+        case "desktop":
+        default:
+          return "100%";
+      }
     }
-  }
+  };
 
   // Handle canvas click to deselect elements
   const handleCanvasClick = (e: React.MouseEvent) => {
     // Only deselect if clicking directly on canvas, not on elements
     if (e.target === e.currentTarget) {
-      dispatch({ type: "SELECT_ELEMENT", payload: { id: null } })
+      dispatch({ type: "SELECT_ELEMENT", payload: { id: null } });
     }
-  }
-  
+  };
+
   useEffect(() => {
-  if (cavRef.current) {
-    drop(cavRef)
-  }
-}, [drop])
+    if (cavRef.current) {
+      drop(cavRef);
+    }
+  }, [drop]);
 
   return (
-    <div className="h-full bg-gray-100 overflow-auto">
-      <div className="flex justify-center p-8">
+    <div className="h-full bg-[#F0F0F0] relative  overflow-auto">
+      <div className="flex justify-center ">
         <div
           ref={cavRef}
           onClick={handleCanvasClick}
           data-canvas="true"
           className={cn(
-            "bg-white min-h-[600px] shadow-lg transition-all duration-200 relative",
-            state.currentBreakpoint !== "desktop" && "mx-auto",
+            "bg-white shadow-lg transition-all duration-300 relative",
+            state.isPreviewMode
+              ? "mx-auto h-full" // Keep it centered in Preview
+              : "h-screen",
+            state.currentBreakpoint !== "desktop" && "mx-auto"
           )}
           style={{
             width: getCanvasWidth(),
-            maxWidth: state.currentBreakpoint === "desktop" ? "none" : getCanvasWidth(),
+            maxWidth:
+              state.currentBreakpoint === "desktop" ? "100%" : getCanvasWidth(),
           }}
         >
           {state.elements.length === 0 ? (
             <div className="flex items-center justify-center h-96 text-gray-500">
               <div className="text-center">
-                <p className="text-lg mb-2">Drop elements here to start building</p>
-                <p className="text-sm">Drag components from the sidebar to get started</p>
+                <p className="text-lg mb-2">
+                  Drop elements here to start building
+                </p>
+                <p className="text-sm">
+                  Drag components from the sidebar to get started
+                </p>
               </div>
             </div>
           ) : (
@@ -206,5 +247,5 @@ const cavRef = useRef<HTMLDivElement>(null)
         </div>
       </div>
     </div>
-  )
+  );
 }

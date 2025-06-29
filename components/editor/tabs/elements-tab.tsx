@@ -311,16 +311,16 @@ function DraggableElement({ elementType }: { elementType: ElementType }) {
   return (
     <div
       ref={ref}
-      className={`group p-3 border border-gray-200 rounded-lg cursor-move hover:bg-gray-50 hover:border-blue-300 transition-all ${
+      className={`group px-3  py-2 border border-gray-200 rounded-lg cursor-move hover:bg-gray-50 hover:border-[#FB354C] transition-all ${
         isDragging ? "opacity-50 scale-95" : ""
       }`}
     >
       <div className="flex items-center space-x-3">
-        <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-          <Icon className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
+        <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-[#FFD6DA] transition-colors">
+          <Icon className="w-4 h-4 text-gray-600 group-hover:text-[#FB354C]" />
         </div>
         <div>
-          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+          <span className="text-xs font-medium text-gray-700 group-hover:text-gray-900">
             {elementType.label}
           </span>
           <p className="text-xs text-gray-500 mt-0.5">{elementType.tag}</p>
@@ -335,14 +335,14 @@ export function ElementsTab() {
 
   return (
     <div className="p-4">
-      <h3 className="text-sm font-semibold text-gray-900 mb-4">Add Elements</h3>
+      <h3 className="text-xs font-semibold text-gray-900 mb-4">Add Elements</h3>
       <ScrollArea className="h-[calc(100vh-200px)]">
         <div className="space-y-6">
           {categories.map((category) => (
             <div key={category}>
-              <h4 className="text-xs font-medium text-gray-600 mb-3 uppercase tracking-wide">
+              {/* <h4 className="text-xs font-medium text-gray-600 mb-3 uppercase tracking-wide">
                 {category}
-              </h4>
+              </h4> */}
               <div className="space-y-2">
                 {elementTypes
                   .filter((el) => el.category === category)

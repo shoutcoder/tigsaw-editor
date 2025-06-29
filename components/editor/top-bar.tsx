@@ -115,7 +115,7 @@ export function TopBar() {
   const canRedo = state.historyIndex < state.history.length - 1;
 
   return (
-    <div className="py-2 w-full bg-[#F0F0F0] border-b gap-4 border-gray-200 flex  items-center  px-3 shrink-0">
+    <div className=" w-full bg-[#F0F0F0]  gap-3  flex  items-center  p-3 shrink-0">
       {/* Left Section */}
       <div className="flex items-center min-w-[220px] md:w-[280px] space-x-2 bg-white p-3 rounded-xl text-sm">
         <Button

@@ -81,47 +81,62 @@ export function EditorLayout() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 text-gray-900">
+    <div className="flex flex-col h-screen bg-[#F0F0F0] text-gray-900">
       <TopBar />
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar */}
-        <div
-          className="bg-white border-r border-gray-200 flex-shrink-0 transition-width duration-300"
-          style={{ width: leftSidebarWidth }}
-        >
-          <Sidebar
-            isExpanded={isLeftPanelExpanded}
-            onToggle={toggleLeftPanel}
-          />
-        </div>
 
-        {/* Resize Handle for Left Sidebar */}
+      {/* Main Content Layout */}
+      <div className="flex flex-1 overflow-hidden mb-3">
+        {/* Left Sidebar - only shown when preview mode is off */}
+        {!state.isPreviewMode && (
+          <div
+            className="bg-white flex-shrink-0 transition-all duration-300"
+            style={{ width: leftSidebarWidth }}
+          >
+            <Sidebar
+              isExpanded={isLeftPanelExpanded}
+              onToggle={toggleLeftPanel}
+            />
+          </div>
+        )}
+
+        {/* Resize handle for Left Sidebar */}
+        {!state.isPreviewMode && (
+          <div
+            className={cn(
+              "w-3 cursor-col-resize flex-shrink-0",
+              !isLeftPanelExpanded && "opacity-0 pointer-events-none"
+            )}
+            onMouseDown={handleLeftResize}
+          />
+        )}
+
+        {/* Main Content - Always rendered */}
         <div
           className={cn(
-            "w-1.5 bg-gray-200 hover:bg-gray-300 cursor-col-resize flex-shrink-0",
-            !isLeftPanelExpanded && "opacity-0 pointer-events-none w-1.5"
+            "relative flex flex-col overflow-hidden transition-all duration-300",
+            state.isPreviewMode ? "flex-1 px-3" : "flex-1"
           )}
-          onMouseDown={handleLeftResize}
-        />
-
-        {/* Main Content (Canvas) */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        >
           <Canvas />
         </div>
 
-        {/* Resize Handle for Right Sidebar */}
-        <div
-          className="w-1.5 bg-gray-200 hover:bg-gray-300 cursor-col-resize flex-shrink-0"
-          onMouseDown={handleRightResize}
-        />
+        {/* Resize handle for right panel */}
+        {!state.isPreviewMode && (
+          <div
+            className="w-3 cursor-col-resize flex-shrink-0"
+            onMouseDown={handleRightResize}
+          />
+        )}
 
-        {/* Right Sidebar (Style Panel) */}
-        <div
-          className="mr-3 bg-white border-l border-gray-200 flex-shrink-0"
-          style={{ width: rightSidebarWidth }}
-        >
-          <StylePanel />
-        </div>
+        {/* Right Sidebar */}
+        {!state.isPreviewMode && (
+          <div
+            className="mr-3 bg-white rounded-2xl flex-shrink-0"
+            style={{ width: rightSidebarWidth }}
+          >
+            <StylePanel />
+          </div>
+        )}
       </div>
     </div>
   );

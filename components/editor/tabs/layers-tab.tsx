@@ -314,7 +314,7 @@ function LayerItem({ element, level, index, parentId, path }: LayerItemProps) {
         ref={ref}
         data-handler-id={handlerId}
         className={cn(
-          "flex items-center py-2 px-2 hover:bg-gray-50 cursor-pointer text-sm",
+          "flex items-center py-2 px-2 hover:bg-gray-50 cursor-pointer text-xs",
           isSelected && "bg-gray-50",
           showNestIndicator && "bg-gray-50 border border-gray-200 border-dashed"
         )}
@@ -351,7 +351,7 @@ function LayerItem({ element, level, index, parentId, path }: LayerItemProps) {
           {getElementIcon()}
         </div>
 
-        <span className="flex-1 truncate text-sm">
+        <span className="flex-1 truncate text-xs">
           {element.tag}
           {element.tag === "footer" && (
             <span className="ml-2 text-xs bg-gray-100 px-1.5 py-0.5 rounded">
@@ -424,7 +424,7 @@ function LayerItem({ element, level, index, parentId, path }: LayerItemProps) {
           ))}
           {(!element.children || element.children.length === 0) && (
             <div
-              className="py-2 px-2 text-sm text-gray-400 italic"
+              className="py-2 px-2 text-xs text-gray-400 italic"
               style={{ paddingLeft: `${(level + 1) * 16 + 24}px` }}
             >
               Empty {element.tag}
@@ -445,7 +445,7 @@ export function LayersTab() {
         <RootDropZone path="root">
           <div className="space-y-0.5">
             {state.elements.length === 0 ? (
-              <p className="text-sm text-gray-500 text-center py-8">
+              <p className="text-xs text-gray-500 text-center py-8">
                 No elements yet. Drag elements from the Elements tab to get
                 started.
               </p>

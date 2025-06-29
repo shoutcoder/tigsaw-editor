@@ -1,50 +1,52 @@
-"use client"
+"use client";
 
-import { useEditor } from "@/contexts/editor-context"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Code, Play, RotateCcw } from "lucide-react"
-import { useState } from "react"
+import { useEditor } from "@/contexts/editor-context";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Code, Play, RotateCcw } from "lucide-react";
+import { useState } from "react";
 
 export function GlobalJsTab() {
-  const { state, dispatch } = useEditor()
-  const [jsCode, setJsCode] = useState(state.globalJs || "")
+  const { state, dispatch } = useEditor();
+  const [jsCode, setJsCode] = useState(state.globalJs || "");
 
   const handleSave = () => {
-    dispatch({ type: "SET_GLOBAL_JS", payload: { js: jsCode } })
-  }
+    dispatch({ type: "SET_GLOBAL_JS", payload: { js: jsCode } });
+  };
 
   const handleReset = () => {
-    setJsCode("")
-    dispatch({ type: "SET_GLOBAL_JS", payload: { js: "" } })
-  }
+    setJsCode("");
+    dispatch({ type: "SET_GLOBAL_JS", payload: { js: "" } });
+  };
 
   const handleExecute = () => {
     try {
-      console.log("🚀 Manually executing JS:", jsCode)
-      const executeJs = new Function(jsCode)
-      executeJs()
-      console.log("✅ JS executed successfully")
+      console.log("🚀 Manually executing JS:", jsCode);
+      const executeJs = new Function(jsCode);
+      executeJs();
+      console.log("✅ JS executed successfully");
     } catch (error) {
-      console.error("❌ Error executing JS:", error)
+      console.error("❌ Error executing JS:", error);
     }
-  }
+  };
 
   return (
     <div className="p-4">
-      <h3 className="text-sm font-semibold text-gray-900 mb-4">Global JavaScript</h3>
+      <h3 className="text-sm font-semibold text-gray-900 mb-4">
+        Global JavaScript
+      </h3>
       <ScrollArea className="h-[calc(100vh-200px)]">
         <div className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
+          <div>
+            <div className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Code className="w-4 h-4" />
                 JavaScript Code
               </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            </div>
+            <div className="space-y-4">
               <Textarea
                 value={jsCode}
                 onChange={(e) => setJsCode(e.target.value)}
@@ -74,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 className="font-mono text-xs h-64 bg-gray-50"
               />
 
-              <div className="flex gap-2">
+              <div className="flex gap-1.5 flex-wrap">
                 <Button onClick={handleSave} size="sm">
                   Save & Apply
                 </Button>
@@ -89,15 +91,20 @@ document.addEventListener('DOMContentLoaded', function() {
               </div>
 
               <div className="text-xs text-gray-500 space-y-1">
-                <p>• This JavaScript will be executed in the editor environment</p>
-                <p>• Code runs when switching to browse mode or when manually executed</p>
+                <p>
+                  • This JavaScript will be executed in the editor environment
+                </p>
+                <p>
+                  • Code runs when switching to browse mode or when manually
+                  executed
+                </p>
                 <p>• Use console.log() to debug - check browser console</p>
                 <p>• This code will also be included in the exported website</p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </ScrollArea>
     </div>
-  )
+  );
 }

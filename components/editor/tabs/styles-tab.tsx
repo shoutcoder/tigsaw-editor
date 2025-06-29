@@ -1,17 +1,28 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useEditor, findElementById, getComputedStyles, hasBreakpointStyles } from "@/contexts/editor-context"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { Slider } from "@/components/ui/slider"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
+import {
+  useEditor,
+  findElementById,
+  getComputedStyles,
+  hasBreakpointStyles,
+} from "@/contexts/editor-context";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   AlignLeft,
   AlignCenter,
@@ -47,12 +58,17 @@ import {
   ImageIcon as ImageIconLucide,
   MinusCircle,
   Settings,
-} from "lucide-react"
-import { useState, useEffect, useCallback } from "react"
-import { cn } from "@/lib/utils"
-import { Textarea } from "@/components/ui/textarea"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs" // For inset/outset shadow
+  Layers,
+} from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { cn } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"; // For inset/outset shadow
 
 // Define which elements can have layout controls
 const LAYOUT_ELEMENTS = [
@@ -67,7 +83,7 @@ const LAYOUT_ELEMENTS = [
   "figure",
   "form",
   "fieldset",
-]
+];
 
 const FONT_SIZES = [
   { name: "XS", value: "12px" },
@@ -79,10 +95,14 @@ const FONT_SIZES = [
   { name: "3XL", value: "30px" },
   { name: "4XL", value: "36px" },
   { name: "5XL", value: "48px" },
-]
+];
 
 const WEB_SAFE_FONTS = [
-  { name: "Default", value: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif" },
+  {
+    name: "Default",
+    value:
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+  },
   { name: "Arial", value: "Arial, Helvetica, sans-serif" },
   { name: "Verdana", value: "Verdana, Geneva, sans-serif" },
   { name: "Georgia", value: "Georgia, serif" },
@@ -92,8 +112,8 @@ const WEB_SAFE_FONTS = [
   { name: "Tahoma", value: "Tahoma, Geneva, sans-serif" },
   { name: "Trebuchet MS", value: "'Trebuchet MS', Helvetica, sans-serif" },
   { name: "Impact", value: "Impact, Charcoal, sans-serif" },
-]
-const CUSTOM_FONT_KEY = "custom-font"
+];
+const CUSTOM_FONT_KEY = "custom-font";
 
 const COLOR_PRESETS = [
   "transparent",
@@ -112,26 +132,26 @@ const COLOR_PRESETS = [
   "#06b6d4",
   "#84cc16",
   "#f59e0b",
-]
+];
 
 interface ColorPickerProps {
-  value: string
-  onChange: (value: string) => void
-  label: string
-  isInherited?: boolean
-  onReset?: () => void
-  className?: string
-  popoverSide?: "top" | "right" | "bottom" | "left"
-  popoverAlign?: "start" | "center" | "end"
+  value: string;
+  onChange: (value: string) => void;
+  label: string;
+  isInherited?: boolean;
+  onReset?: () => void;
+  className?: string;
+  popoverSide?: "top" | "right" | "bottom" | "left";
+  popoverAlign?: "start" | "center" | "end";
 }
 
 interface ShadowProps {
-  offsetX: string
-  offsetY: string
-  blurRadius: string
-  spreadRadius?: string // Optional for text-shadow
-  color: string
-  inset: boolean
+  offsetX: string;
+  offsetY: string;
+  blurRadius: string;
+  spreadRadius?: string; // Optional for text-shadow
+  color: string;
+  inset: boolean;
 }
 
 function ColorPicker({
@@ -144,8 +164,8 @@ function ColorPicker({
   popoverSide = "bottom",
   popoverAlign = "center",
 }: ColorPickerProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const displayValue = value || (isInherited ? "Inherited" : "#000000")
+  const [isOpen, setIsOpen] = useState(false);
+  const displayValue = value || (isInherited ? "Inherited" : "#000000");
 
   return (
     <div className={className}>
@@ -171,7 +191,7 @@ function ColorPicker({
             variant="outline"
             className={cn(
               "w-full h-9 justify-start text-left font-normal text-xs",
-              isInherited && "border-blue-300 border-dashed",
+              isInherited && "border-blue-300 border-dashed"
             )}
           >
             <div className="flex items-center gap-2">
@@ -179,15 +199,22 @@ function ColorPicker({
                 className={cn(
                   "w-4 h-4 rounded border",
                   displayValue === "transparent" &&
-                    "bg-transparent bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'8'%20height%3D'8'%20viewBox%3D'0%200%208%208'%3E%3Cpath%20d%3D'M0%200h4v4H0zM4%204h4v4H4z'%20fill%3D'%23d1d5db'%2F%3E%3C%2Fsvg%3E')]",
+                    "bg-transparent bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'8'%20height%3D'8'%20viewBox%3D'0%200%208%208'%3E%3Cpath%20d%3D'M0%200h4v4H0zM4%204h4v4H4z'%20fill%3D'%23d1d5db'%2F%3E%3C%2Fsvg%3E')]"
                 )}
-                style={{ backgroundColor: displayValue === "transparent" ? undefined : displayValue }}
+                style={{
+                  backgroundColor:
+                    displayValue === "transparent" ? undefined : displayValue,
+                }}
               />
               <span className="truncate">{displayValue}</span>
             </div>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 border-none" side={popoverSide} align={popoverAlign}>
+        <PopoverContent
+          className="w-auto p-0 border-none"
+          side={popoverSide}
+          align={popoverAlign}
+        >
           <div className="p-3 rounded-md shadow-lg bg-white border border-gray-200">
             <Input
               type="color"
@@ -198,7 +225,10 @@ function ColorPicker({
             <Input
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              className={cn("w-full text-xs h-8 mb-2", isInherited && "border-blue-300 border-dashed")}
+              className={cn(
+                "w-full text-xs h-8 mb-2",
+                isInherited && "border-blue-300 border-dashed"
+              )}
               placeholder="#000000 or transparent"
             />
             <div className="grid grid-cols-8 gap-1">
@@ -208,20 +238,27 @@ function ColorPicker({
                   className={cn(
                     "w-6 h-6 rounded cursor-pointer border border-gray-200 hover:scale-110 transition-transform",
                     color === "transparent" &&
-                      "bg-transparent bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'8'%20height%3D'8'%20viewBox%3D'0%200%208%208'%3E%3Cpath%20d%3D'M0%200h4v4H0zM4%204h4v4H4z'%20fill%3D'%23d1d5db'%2F%3E%3C%2Fsvg%3E')]",
+                      "bg-transparent bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'8'%20height%3D'8'%20viewBox%3D'0%200%208%208'%3E%3Cpath%20d%3D'M0%200h4v4H0zM4%204h4v4H4z'%20fill%3D'%23d1d5db'%2F%3E%3C%2Fsvg%3E')]"
                   )}
-                  style={{ backgroundColor: color === "transparent" ? undefined : color }}
+                  style={{
+                    backgroundColor:
+                      color === "transparent" ? undefined : color,
+                  }}
                   onClick={() => onChange(color)}
                   title={color}
                 />
               ))}
             </div>
-            {isInherited && <p className="text-xs text-blue-600 mt-1">Inherited from desktop</p>}
+            {isInherited && (
+              <p className="text-xs text-blue-600 mt-1">
+                Inherited from desktop
+              </p>
+            )}
           </div>
         </PopoverContent>
       </Popover>
     </div>
-  )
+  );
 }
 
 function AttributesControl({ selectedElement, updateAttribute }: any) {
@@ -230,46 +267,54 @@ function AttributesControl({ selectedElement, updateAttribute }: any) {
     { key: "class", label: "CSS Class", placeholder: "my-custom-class" },
     { key: "title", label: "Title", placeholder: "Tooltip text" },
     { key: "data-testid", label: "Test ID", placeholder: "test-element" },
-  ]
+  ];
 
   // Get element-specific attributes
   const getElementSpecificAttributes = () => {
     switch (selectedElement.tag) {
       case "a":
         return [
-          { key: "href", label: "Link URL", placeholder: "https://example.com" },
+          {
+            key: "href",
+            label: "Link URL",
+            placeholder: "https://example.com",
+          },
           { key: "target", label: "Target", placeholder: "_blank" },
           { key: "rel", label: "Rel", placeholder: "noopener noreferrer" },
-        ]
+        ];
       case "img":
         return [
           { key: "alt", label: "Alt Text", placeholder: "Image description" },
           { key: "loading", label: "Loading", placeholder: "lazy" },
-        ]
+        ];
       case "input":
         return [
           { key: "type", label: "Type", placeholder: "text" },
-          { key: "placeholder", label: "Placeholder", placeholder: "Enter text..." },
+          {
+            key: "placeholder",
+            label: "Placeholder",
+            placeholder: "Enter text...",
+          },
           { key: "name", label: "Name", placeholder: "field-name" },
           { key: "required", label: "Required", placeholder: "true" },
-        ]
+        ];
       case "button":
         return [
           { key: "type", label: "Type", placeholder: "button" },
           { key: "disabled", label: "Disabled", placeholder: "false" },
-        ]
+        ];
       case "form":
         return [
           { key: "action", label: "Action", placeholder: "/submit" },
           { key: "method", label: "Method", placeholder: "POST" },
-        ]
+        ];
       default:
-        return []
+        return [];
     }
-  }
+  };
 
-  const elementSpecificAttributes = getElementSpecificAttributes()
-  const allAttributes = [...commonAttributes, ...elementSpecificAttributes]
+  const elementSpecificAttributes = getElementSpecificAttributes();
+  const allAttributes = [...commonAttributes, ...elementSpecificAttributes];
 
   return (
     <Card>
@@ -293,27 +338,35 @@ function AttributesControl({ selectedElement, updateAttribute }: any) {
         ))}
 
         <div className="pt-2 border-t border-gray-200">
-          <p className="text-xs text-gray-500 mb-2">💡 Tip: Add an ID to target elements with JavaScript</p>
-          <div className="bg-gray-50 p-2 rounded text-xs font-mono">document.getElementById('your-id')</div>
+          <p className="text-xs text-gray-500 mb-2">
+            💡 Tip: Add an ID to target elements with JavaScript
+          </p>
+          <div className="bg-gray-50 p-2 rounded text-xs font-mono">
+            document.getElementById('your-id')
+          </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function LayoutBuilder() {
-  const { state, dispatch } = useEditor()
+  const { state, dispatch } = useEditor();
 
-  const currentElement = findElementById(state.elements, state.selectedElement)
-  if (!currentElement) return null
+  const currentElement = findElementById(state.elements, state.selectedElement);
+  if (!currentElement) return null;
 
-  const computedStyles = getComputedStyles(currentElement, state.currentBreakpoint)
+  const computedStyles = getComputedStyles(
+    currentElement,
+    state.currentBreakpoint
+  );
   const hasSpecificStyles =
-    state.currentBreakpoint !== "desktop" && hasBreakpointStyles(currentElement, state.currentBreakpoint)
+    state.currentBreakpoint !== "desktop" &&
+    hasBreakpointStyles(currentElement, state.currentBreakpoint);
 
-  const currentDisplay = computedStyles.display || "block"
-  const isStack = currentDisplay === "flex"
-  const isGrid = currentDisplay === "grid"
+  const currentDisplay = computedStyles.display || "block";
+  const isStack = currentDisplay === "flex";
+  const isGrid = currentDisplay === "grid";
 
   const updateStyle = (property: string, value: string | number) => {
     dispatch({
@@ -325,8 +378,8 @@ function LayoutBuilder() {
           [property]: value,
         },
       },
-    })
-  }
+    });
+  };
 
   const updateAllStyles = (newStyles: Record<string, any>) => {
     dispatch({
@@ -336,17 +389,18 @@ function LayoutBuilder() {
         breakpoint: state.currentBreakpoint,
         styles: newStyles,
       },
-    })
-  }
+    });
+  };
 
   const resetStyleToDesktop = (property: string | string[]) => {
-    if (state.currentBreakpoint === "desktop") return
+    if (state.currentBreakpoint === "desktop") return;
 
-    const currentBreakpointStyles = currentElement.styles[state.currentBreakpoint] || {}
-    const newBreakpointStyles = { ...currentBreakpointStyles }
+    const currentBreakpointStyles =
+      currentElement.styles[state.currentBreakpoint] || {};
+    const newBreakpointStyles = { ...currentBreakpointStyles };
 
-    const propsToReset = Array.isArray(property) ? property : [property]
-    propsToReset.forEach((prop) => delete newBreakpointStyles[prop])
+    const propsToReset = Array.isArray(property) ? property : [property];
+    propsToReset.forEach((prop) => delete newBreakpointStyles[prop]);
 
     dispatch({
       type: "UPDATE_ELEMENT",
@@ -355,12 +409,15 @@ function LayoutBuilder() {
         updates: {
           styles: {
             ...currentElement.styles,
-            [state.currentBreakpoint]: Object.keys(newBreakpointStyles).length > 0 ? newBreakpointStyles : undefined,
+            [state.currentBreakpoint]:
+              Object.keys(newBreakpointStyles).length > 0
+                ? newBreakpointStyles
+                : undefined,
           },
         },
       },
-    })
-  }
+    });
+  };
 
   const setLayoutType = (type: "stack" | "grid") => {
     if (type === "stack") {
@@ -374,8 +431,8 @@ function LayoutBuilder() {
         gridTemplateColumns: "",
         gridTemplateRows: "",
         justifyItems: "",
-      }
-      updateAllStyles(flexStyles)
+      };
+      updateAllStyles(flexStyles);
     } else if (type === "grid") {
       const gridStyles = {
         display: "grid",
@@ -386,23 +443,26 @@ function LayoutBuilder() {
         flexDirection: "",
         justifyContent: "",
         flexWrap: "",
-      }
-      updateAllStyles(gridStyles)
+      };
+      updateAllStyles(gridStyles);
     }
-  }
+  };
 
   const getGapValue = () => {
-    const gap = computedStyles.gap || "16px"
-    return Number.parseFloat(gap.replace("px", "")) || 16
-  }
+    const gap = computedStyles.gap || "16px";
+    return Number.parseFloat(gap.replace("px", "")) || 16;
+  };
 
   const setGap = (value: number) => {
-    updateStyle("gap", `${value}px`)
-  }
+    updateStyle("gap", `${value}px`);
+  };
 
   const isDisplayInherited =
-    state.currentBreakpoint !== "desktop" && !currentElement.styles[state.currentBreakpoint]?.display
-  const isGapInherited = state.currentBreakpoint !== "desktop" && !currentElement.styles[state.currentBreakpoint]?.gap
+    state.currentBreakpoint !== "desktop" &&
+    !currentElement.styles[state.currentBreakpoint]?.display;
+  const isGapInherited =
+    state.currentBreakpoint !== "desktop" &&
+    !currentElement.styles[state.currentBreakpoint]?.gap;
 
   return (
     <Card>
@@ -449,7 +509,7 @@ function LayoutBuilder() {
                 isStack
                   ? "bg-blue-500 text-white shadow-sm hover:bg-blue-600"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50",
-                isDisplayInherited && "border-blue-300 border-dashed",
+                isDisplayInherited && "border-blue-300 border-dashed"
               )}
               onClick={() => setLayoutType("stack")}
             >
@@ -463,14 +523,16 @@ function LayoutBuilder() {
                 isGrid
                   ? "bg-blue-500 text-white shadow-sm hover:bg-blue-600"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50",
-                isDisplayInherited && "border-blue-300 border-dashed",
+                isDisplayInherited && "border-blue-300 border-dashed"
               )}
               onClick={() => setLayoutType("grid")}
             >
               Grid
             </Button>
           </div>
-          {isDisplayInherited && <p className="text-xs text-blue-600">Inherited from desktop</p>}
+          {isDisplayInherited && (
+            <p className="text-xs text-blue-600">Inherited from desktop</p>
+          )}
         </div>
 
         {(isStack || isGrid) && (
@@ -478,7 +540,9 @@ function LayoutBuilder() {
             {isStack && (
               <>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Direction</Label>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Direction
+                  </Label>
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
@@ -487,7 +551,7 @@ function LayoutBuilder() {
                         "flex-1 h-10 transition-all",
                         computedStyles.flexDirection === "row"
                           ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300",
+                          : "border-gray-200 hover:border-gray-300"
                       )}
                       onClick={() => updateStyle("flexDirection", "row")}
                     >
@@ -498,9 +562,10 @@ function LayoutBuilder() {
                       size="sm"
                       className={cn(
                         "flex-1 h-10 transition-all",
-                        computedStyles.flexDirection === "column" || !computedStyles.flexDirection
+                        computedStyles.flexDirection === "column" ||
+                          !computedStyles.flexDirection
                           ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300",
+                          : "border-gray-200 hover:border-gray-300"
                       )}
                       onClick={() => updateStyle("flexDirection", "column")}
                     >
@@ -510,10 +575,14 @@ function LayoutBuilder() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Distribute</Label>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Distribute
+                  </Label>
                   <Select
                     value={computedStyles.justifyContent || "flex-start"}
-                    onValueChange={(value) => updateStyle("justifyContent", value)}
+                    onValueChange={(value) =>
+                      updateStyle("justifyContent", value)
+                    }
                   >
                     <SelectTrigger className="h-10 border-gray-200">
                       <SelectValue />
@@ -522,7 +591,9 @@ function LayoutBuilder() {
                       <SelectItem value="flex-start">Start</SelectItem>
                       <SelectItem value="center">Center</SelectItem>
                       <SelectItem value="flex-end">End</SelectItem>
-                      <SelectItem value="space-between">Space Between</SelectItem>
+                      <SelectItem value="space-between">
+                        Space Between
+                      </SelectItem>
                       <SelectItem value="space-around">Space Around</SelectItem>
                       <SelectItem value="space-evenly">Space Evenly</SelectItem>
                     </SelectContent>
@@ -530,7 +601,9 @@ function LayoutBuilder() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Align</Label>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Align
+                  </Label>
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
@@ -539,7 +612,7 @@ function LayoutBuilder() {
                         "flex-1 h-10 transition-all",
                         computedStyles.alignItems === "flex-start"
                           ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300",
+                          : "border-gray-200 hover:border-gray-300"
                       )}
                       onClick={() => updateStyle("alignItems", "flex-start")}
                     >
@@ -556,7 +629,7 @@ function LayoutBuilder() {
                         "flex-1 h-10 transition-all",
                         computedStyles.alignItems === "center"
                           ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300",
+                          : "border-gray-200 hover:border-gray-300"
                       )}
                       onClick={() => updateStyle("alignItems", "center")}
                     >
@@ -573,7 +646,7 @@ function LayoutBuilder() {
                         "flex-1 h-10 transition-all",
                         computedStyles.alignItems === "flex-end"
                           ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300",
+                          : "border-gray-200 hover:border-gray-300"
                       )}
                       onClick={() => updateStyle("alignItems", "flex-end")}
                     >
@@ -590,7 +663,9 @@ function LayoutBuilder() {
             {isGrid && (
               <>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Columns</Label>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Columns
+                  </Label>
                   <div className="grid grid-cols-2 gap-1 mb-2">
                     {[
                       { label: "1", value: "1fr" },
@@ -606,9 +681,11 @@ function LayoutBuilder() {
                           "h-10 text-sm transition-all",
                           computedStyles.gridTemplateColumns === option.value
                             ? "border-blue-500 bg-blue-50 text-blue-700"
-                            : "border-gray-200 hover:border-gray-300",
+                            : "border-gray-200 hover:border-gray-300"
                         )}
-                        onClick={() => updateStyle("gridTemplateColumns", option.value)}
+                        onClick={() =>
+                          updateStyle("gridTemplateColumns", option.value)
+                        }
                       >
                         {option.label} Col
                       </Button>
@@ -616,7 +693,9 @@ function LayoutBuilder() {
                   </div>
                   <Input
                     value={computedStyles.gridTemplateColumns || "1fr 1fr"}
-                    onChange={(e) => updateStyle("gridTemplateColumns", e.target.value)}
+                    onChange={(e) =>
+                      updateStyle("gridTemplateColumns", e.target.value)
+                    }
                     placeholder="1fr 1fr"
                     className="h-10 border-gray-200"
                   />
@@ -642,10 +721,12 @@ function LayoutBuilder() {
                 <div className="w-20">
                   <Input
                     value={getGapValue()}
-                    onChange={(e) => setGap(Number.parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      setGap(Number.parseFloat(e.target.value) || 0)
+                    }
                     className={cn(
                       "h-10 text-center border-gray-200",
-                      isGapInherited && "border-blue-300 border-dashed",
+                      isGapInherited && "border-blue-300 border-dashed"
                     )}
                     type="number"
                     min="0"
@@ -663,25 +744,27 @@ function LayoutBuilder() {
                   />
                 </div>
               </div>
-              {isGapInherited && <p className="text-xs text-blue-600">Inherited from desktop</p>}
+              {isGapInherited && (
+                <p className="text-xs text-blue-600">Inherited from desktop</p>
+              )}
             </div>
           </>
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function CustomHtmlEditor({ selectedElement, updateContent }: any) {
-  const [htmlContent, setHtmlContent] = useState(selectedElement.content || "")
+  const [htmlContent, setHtmlContent] = useState(selectedElement.content || "");
 
   useEffect(() => {
-    setHtmlContent(selectedElement.content || "")
-  }, [selectedElement.content])
+    setHtmlContent(selectedElement.content || "");
+  }, [selectedElement.content]);
 
   const handleBlur = () => {
-    updateContent(htmlContent)
-  }
+    updateContent(htmlContent);
+  };
 
   return (
     <Card>
@@ -700,43 +783,61 @@ function CustomHtmlEditor({ selectedElement, updateContent }: any) {
           className="mt-1 font-mono text-xs h-48 bg-gray-50"
         />
         <p className="text-xs text-gray-500 mt-2">
-          Note: Scripts may not run in the editor but will be included in the export.
+          Note: Scripts may not run in the editor but will be included in the
+          export.
         </p>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-function TypographyControls({ selectedElement, updateStyle, updateContent }: any) {
-  const { state, dispatch } = useEditor()
-  const computedStyles = getComputedStyles(selectedElement, state.currentBreakpoint)
+function TypographyControls({
+  selectedElement,
+  updateStyle,
+  updateContent,
+}: any) {
+  const { state, dispatch } = useEditor();
+  const computedStyles = getComputedStyles(
+    selectedElement,
+    state.currentBreakpoint
+  );
   const hasSpecificStyles =
-    state.currentBreakpoint !== "desktop" && hasBreakpointStyles(selectedElement, state.currentBreakpoint)
+    state.currentBreakpoint !== "desktop" &&
+    hasBreakpointStyles(selectedElement, state.currentBreakpoint);
 
-  const [isCustomFont, setIsCustomFont] = useState(false)
-  const [customFontName, setCustomFontName] = useState("")
-  const [customFontUrl, setCustomFontUrl] = useState("")
+  const [isCustomFont, setIsCustomFont] = useState(false);
+  const [customFontName, setCustomFontName] = useState("");
+  const [customFontUrl, setCustomFontUrl] = useState("");
 
   useEffect(() => {
-    const currentFontFamily = computedStyles.fontFamily || WEB_SAFE_FONTS[0].value
-    const isWebSafe = WEB_SAFE_FONTS.some((font) => font.value === currentFontFamily)
+    const currentFontFamily =
+      computedStyles.fontFamily || WEB_SAFE_FONTS[0].value;
+    const isWebSafe = WEB_SAFE_FONTS.some(
+      (font) => font.value === currentFontFamily
+    );
     if (!isWebSafe && currentFontFamily) {
-      setIsCustomFont(true)
-      setCustomFontName(currentFontFamily)
-      setCustomFontUrl(computedStyles.fontFaceUrl || "")
+      setIsCustomFont(true);
+      setCustomFontName(currentFontFamily);
+      setCustomFontUrl(computedStyles.fontFaceUrl || "");
     } else {
-      setIsCustomFont(false)
+      setIsCustomFont(false);
     }
-  }, [computedStyles.fontFamily, computedStyles.fontFaceUrl, state.selectedElement, state.currentBreakpoint])
+  }, [
+    computedStyles.fontFamily,
+    computedStyles.fontFaceUrl,
+    state.selectedElement,
+    state.currentBreakpoint,
+  ]);
 
   const resetStyleToDesktop = (property: string | string[]) => {
-    if (state.currentBreakpoint === "desktop") return
+    if (state.currentBreakpoint === "desktop") return;
 
-    const currentBreakpointStyles = selectedElement.styles[state.currentBreakpoint] || {}
-    const newBreakpointStyles = { ...currentBreakpointStyles }
+    const currentBreakpointStyles =
+      selectedElement.styles[state.currentBreakpoint] || {};
+    const newBreakpointStyles = { ...currentBreakpointStyles };
 
-    const propsToReset = Array.isArray(property) ? property : [property]
-    propsToReset.forEach((prop) => delete newBreakpointStyles[prop])
+    const propsToReset = Array.isArray(property) ? property : [property];
+    propsToReset.forEach((prop) => delete newBreakpointStyles[prop]);
 
     dispatch({
       type: "UPDATE_ELEMENT",
@@ -745,39 +846,46 @@ function TypographyControls({ selectedElement, updateStyle, updateContent }: any
         updates: {
           styles: {
             ...selectedElement.styles,
-            [state.currentBreakpoint]: Object.keys(newBreakpointStyles).length > 0 ? newBreakpointStyles : undefined,
+            [state.currentBreakpoint]:
+              Object.keys(newBreakpointStyles).length > 0
+                ? newBreakpointStyles
+                : undefined,
           },
         },
       },
-    })
-  }
+    });
+  };
 
   const handleFontFamilyChange = (value: string) => {
     if (value === CUSTOM_FONT_KEY) {
-      setIsCustomFont(true)
+      setIsCustomFont(true);
       // Don't immediately change font, wait for custom inputs
     } else {
-      setIsCustomFont(false)
-      updateStyle("fontFamily", value)
-      updateStyle("fontFaceUrl", undefined) // Clear custom URL if a web-safe font is chosen
+      setIsCustomFont(false);
+      updateStyle("fontFamily", value);
+      updateStyle("fontFaceUrl", undefined); // Clear custom URL if a web-safe font is chosen
     }
-  }
+  };
 
   const applyCustomFont = () => {
     if (customFontName.trim() !== "") {
-      updateStyle("fontFamily", customFontName.trim())
-      updateStyle("fontFaceUrl", customFontUrl.trim() || undefined)
+      updateStyle("fontFamily", customFontName.trim());
+      updateStyle("fontFaceUrl", customFontUrl.trim() || undefined);
     }
-  }
+  };
 
   const isColorInherited =
-    state.currentBreakpoint !== "desktop" && !selectedElement.styles[state.currentBreakpoint]?.color
+    state.currentBreakpoint !== "desktop" &&
+    !selectedElement.styles[state.currentBreakpoint]?.color;
   const isFontSizeInherited =
-    state.currentBreakpoint !== "desktop" && !selectedElement.styles[state.currentBreakpoint]?.fontSize
+    state.currentBreakpoint !== "desktop" &&
+    !selectedElement.styles[state.currentBreakpoint]?.fontSize;
   const isFontFamilyInherited =
-    state.currentBreakpoint !== "desktop" && !selectedElement.styles[state.currentBreakpoint]?.fontFamily
+    state.currentBreakpoint !== "desktop" &&
+    !selectedElement.styles[state.currentBreakpoint]?.fontFamily;
   const isFontUrlInherited =
-    state.currentBreakpoint !== "desktop" && !selectedElement.styles[state.currentBreakpoint]?.fontFaceUrl
+    state.currentBreakpoint !== "desktop" &&
+    !selectedElement.styles[state.currentBreakpoint]?.fontFaceUrl;
 
   return (
     <Card>
@@ -799,7 +907,9 @@ function TypographyControls({ selectedElement, updateStyle, updateContent }: any
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {(selectedElement.tag === "p" || selectedElement.tag.startsWith("h") || selectedElement.tag === "button") && (
+        {(selectedElement.tag === "p" ||
+          selectedElement.tag.startsWith("h") ||
+          selectedElement.tag === "button") && (
           <div>
             <Label className="text-xs text-gray-600">Content</Label>
             <Input
@@ -820,7 +930,9 @@ function TypographyControls({ selectedElement, updateStyle, updateContent }: any
                 variant="ghost"
                 size="sm"
                 className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
-                onClick={() => resetStyleToDesktop(["fontFamily", "fontFaceUrl"])}
+                onClick={() =>
+                  resetStyleToDesktop(["fontFamily", "fontFaceUrl"])
+                }
                 title="Reset Font Family"
               >
                 <RotateCcw className="w-3 h-3" />
@@ -828,22 +940,37 @@ function TypographyControls({ selectedElement, updateStyle, updateContent }: any
             )}
           </div>
           <Select
-            value={isCustomFont ? CUSTOM_FONT_KEY : computedStyles.fontFamily || WEB_SAFE_FONTS[0].value}
+            value={
+              isCustomFont
+                ? CUSTOM_FONT_KEY
+                : computedStyles.fontFamily || WEB_SAFE_FONTS[0].value
+            }
             onValueChange={handleFontFamilyChange}
           >
-            <SelectTrigger className={cn("text-xs", isFontFamilyInherited && "border-blue-300 border-dashed")}>
+            <SelectTrigger
+              className={cn(
+                "text-xs",
+                isFontFamilyInherited && "border-blue-300 border-dashed"
+              )}
+            >
               <SelectValue placeholder="Select font" />
             </SelectTrigger>
             <SelectContent>
               {WEB_SAFE_FONTS.map((font) => (
-                <SelectItem key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                <SelectItem
+                  key={font.value}
+                  value={font.value}
+                  style={{ fontFamily: font.value }}
+                >
                   {font.name}
                 </SelectItem>
               ))}
               <SelectItem value={CUSTOM_FONT_KEY}>Custom...</SelectItem>
             </SelectContent>
           </Select>
-          {isFontFamilyInherited && <p className="text-xs text-blue-600 mt-1">Inherited from desktop</p>}
+          {isFontFamilyInherited && (
+            <p className="text-xs text-blue-600 mt-1">Inherited from desktop</p>
+          )}
         </div>
 
         {isCustomFont && (
@@ -858,29 +985,35 @@ function TypographyControls({ selectedElement, updateStyle, updateContent }: any
                   "text-xs mt-1",
                   isFontFamilyInherited &&
                     customFontName === computedStyles.fontFamily &&
-                    "border-blue-300 border-dashed",
+                    "border-blue-300 border-dashed"
                 )}
                 onBlur={applyCustomFont}
               />
-              {isFontFamilyInherited && customFontName === computedStyles.fontFamily && (
-                <p className="text-xs text-blue-600 mt-1">Name inherited</p>
-              )}
+              {isFontFamilyInherited &&
+                customFontName === computedStyles.fontFamily && (
+                  <p className="text-xs text-blue-600 mt-1">Name inherited</p>
+                )}
             </div>
             <div>
-              <Label className="text-xs text-gray-600">Font File URL (.woff2, .woff, .ttf)</Label>
+              <Label className="text-xs text-gray-600">
+                Font File URL (.woff2, .woff, .ttf)
+              </Label>
               <Input
                 value={customFontUrl}
                 onChange={(e) => setCustomFontUrl(e.target.value)}
                 placeholder="https://example.com/font.woff2"
                 className={cn(
                   "text-xs mt-1",
-                  isFontUrlInherited && customFontUrl === computedStyles.fontFaceUrl && "border-blue-300 border-dashed",
+                  isFontUrlInherited &&
+                    customFontUrl === computedStyles.fontFaceUrl &&
+                    "border-blue-300 border-dashed"
                 )}
                 onBlur={applyCustomFont}
               />
-              {isFontUrlInherited && customFontUrl === computedStyles.fontFaceUrl && (
-                <p className="text-xs text-blue-600 mt-1">URL inherited</p>
-              )}
+              {isFontUrlInherited &&
+                customFontUrl === computedStyles.fontFaceUrl && (
+                  <p className="text-xs text-blue-600 mt-1">URL inherited</p>
+                )}
             </div>
           </div>
         )}
@@ -904,9 +1037,14 @@ function TypographyControls({ selectedElement, updateStyle, updateContent }: any
             {FONT_SIZES.map((size) => (
               <Button
                 key={size.value}
-                variant={computedStyles.fontSize === size.value ? "default" : "outline"}
+                variant={
+                  computedStyles.fontSize === size.value ? "default" : "outline"
+                }
                 size="sm"
-                className={cn("h-8 text-xs", isFontSizeInherited && "border-blue-300 border-dashed")}
+                className={cn(
+                  "h-8 text-xs",
+                  isFontSizeInherited && "border-blue-300 border-dashed"
+                )}
                 onClick={() => updateStyle("fontSize", size.value)}
               >
                 {size.name}
@@ -917,30 +1055,58 @@ function TypographyControls({ selectedElement, updateStyle, updateContent }: any
             value={computedStyles.fontSize || "16px"}
             onChange={(e) => updateStyle("fontSize", e.target.value)}
             placeholder="16px"
-            className={cn("text-xs", isFontSizeInherited && "border-blue-300 border-dashed")}
+            className={cn(
+              "text-xs",
+              isFontSizeInherited && "border-blue-300 border-dashed"
+            )}
           />
-          {isFontSizeInherited && <p className="text-xs text-blue-600 mt-1">Inherited from desktop</p>}
+          {isFontSizeInherited && (
+            <p className="text-xs text-blue-600 mt-1">Inherited from desktop</p>
+          )}
         </div>
         <div className="grid grid-cols-3 gap-2">
           <Button
-            variant={computedStyles.fontWeight === "bold" ? "default" : "outline"}
+            variant={
+              computedStyles.fontWeight === "bold" ? "default" : "outline"
+            }
             size="sm"
-            onClick={() => updateStyle("fontWeight", computedStyles.fontWeight === "bold" ? "normal" : "bold")}
+            onClick={() =>
+              updateStyle(
+                "fontWeight",
+                computedStyles.fontWeight === "bold" ? "normal" : "bold"
+              )
+            }
           >
             <Bold className="w-4 h-4" />
           </Button>
           <Button
-            variant={computedStyles.fontStyle === "italic" ? "default" : "outline"}
+            variant={
+              computedStyles.fontStyle === "italic" ? "default" : "outline"
+            }
             size="sm"
-            onClick={() => updateStyle("fontStyle", computedStyles.fontStyle === "italic" ? "normal" : "italic")}
+            onClick={() =>
+              updateStyle(
+                "fontStyle",
+                computedStyles.fontStyle === "italic" ? "normal" : "italic"
+              )
+            }
           >
             <Italic className="w-4 h-4" />
           </Button>
           <Button
-            variant={computedStyles.textDecoration === "underline" ? "default" : "outline"}
+            variant={
+              computedStyles.textDecoration === "underline"
+                ? "default"
+                : "outline"
+            }
             size="sm"
             onClick={() =>
-              updateStyle("textDecoration", computedStyles.textDecoration === "underline" ? "none" : "underline")
+              updateStyle(
+                "textDecoration",
+                computedStyles.textDecoration === "underline"
+                  ? "none"
+                  : "underline"
+              )
             }
           >
             <Underline className="w-4 h-4" />
@@ -948,7 +1114,9 @@ function TypographyControls({ selectedElement, updateStyle, updateContent }: any
         </div>
 
         <div>
-          <Label className="text-xs text-gray-600 mb-2 block">Text Alignment</Label>
+          <Label className="text-xs text-gray-600 mb-2 block">
+            Text Alignment
+          </Label>
           <div className="grid grid-cols-4 gap-1">
             {[
               { value: "left", icon: AlignLeft },
@@ -958,7 +1126,9 @@ function TypographyControls({ selectedElement, updateStyle, updateContent }: any
             ].map(({ value, icon: Icon }) => (
               <Button
                 key={value}
-                variant={computedStyles.textAlign === value ? "default" : "outline"}
+                variant={
+                  computedStyles.textAlign === value ? "default" : "outline"
+                }
                 size="sm"
                 onClick={() => updateStyle("textAlign", value)}
               >
@@ -976,16 +1146,16 @@ function TypographyControls({ selectedElement, updateStyle, updateContent }: any
         />
       </CardContent>
     </Card>
-  )
+  );
 }
 
 interface AdvancedSpacingControlProps {
-  label: string
-  type: "padding" | "margin"
-  selectedElement: any
-  updateStyle: (property: string, value: string | number) => void
-  computedStyles: Record<string, any>
-  resetStyle: (property: string | string[]) => void
+  label: string;
+  type: "padding" | "margin";
+  selectedElement: any;
+  updateStyle: (property: string, value: string | number) => void;
+  computedStyles: Record<string, any>;
+  resetStyle: (property: string | string[]) => void;
 }
 
 function AdvancedSpacingControl({
@@ -996,41 +1166,52 @@ function AdvancedSpacingControl({
   computedStyles,
   resetStyle,
 }: AdvancedSpacingControlProps) {
-  const { state, dispatch } = useEditor()
-  const [isLinked, setIsLinked] = useState(true)
+  const { state, dispatch } = useEditor();
+  const [isLinked, setIsLinked] = useState(true);
 
-  const sides = ["Top", "Right", "Bottom", "Left"] as const
+  const sides = ["Top", "Right", "Bottom", "Left"] as const;
 
   const handleShorthandChange = (value: string) => {
-    const updates: Record<string, string> = { [type]: value }
+    const updates: Record<string, string> = { [type]: value };
     sides.forEach((side) => {
-      updates[`${type}${side}`] = value
-    })
+      updates[`${type}${side}`] = value;
+    });
     dispatch({
       type: "UPDATE_ELEMENT_STYLES",
-      payload: { id: selectedElement.id, breakpoint: state.currentBreakpoint, styles: updates },
-    })
-  }
+      payload: {
+        id: selectedElement.id,
+        breakpoint: state.currentBreakpoint,
+        styles: updates,
+      },
+    });
+  };
 
-  const handleIndividualChange = (side: "Top" | "Right" | "Bottom" | "Left", value: string) => {
-    updateStyle(`${type}${side}`, value)
-  }
+  const handleIndividualChange = (
+    side: "Top" | "Right" | "Bottom" | "Left",
+    value: string
+  ) => {
+    updateStyle(`${type}${side}`, value);
+  };
 
   const getSideValue = (side: "Top" | "Right" | "Bottom" | "Left"): string => {
-    return computedStyles[`${type}${side}`] || computedStyles[type] || "0px"
-  }
+    return computedStyles[`${type}${side}`] || computedStyles[type] || "0px";
+  };
 
-  const isSideInherited = (side: "Top" | "Right" | "Bottom" | "Left"): boolean => {
-    if (state.currentBreakpoint === "desktop") return false
-    const breakpointStyles = selectedElement.styles[state.currentBreakpoint]
-    return !breakpointStyles || breakpointStyles[`${type}${side}`] === undefined
-  }
+  const isSideInherited = (
+    side: "Top" | "Right" | "Bottom" | "Left"
+  ): boolean => {
+    if (state.currentBreakpoint === "desktop") return false;
+    const breakpointStyles = selectedElement.styles[state.currentBreakpoint];
+    return (
+      !breakpointStyles || breakpointStyles[`${type}${side}`] === undefined
+    );
+  };
 
   const isShorthandInherited = (): boolean => {
-    if (state.currentBreakpoint === "desktop") return false
-    const breakpointStyles = selectedElement.styles[state.currentBreakpoint]
-    return !breakpointStyles || breakpointStyles[type] === undefined
-  }
+    if (state.currentBreakpoint === "desktop") return false;
+    const breakpointStyles = selectedElement.styles[state.currentBreakpoint];
+    return !breakpointStyles || breakpointStyles[type] === undefined;
+  };
 
   return (
     <div>
@@ -1064,7 +1245,10 @@ function AdvancedSpacingControl({
             type="text"
             value={computedStyles[type] || "0px"}
             onChange={(e) => handleShorthandChange(e.target.value)}
-            className={cn("text-sm h-9", isShorthandInherited() && "border-blue-300 border-dashed")}
+            className={cn(
+              "text-sm h-9",
+              isShorthandInherited() && "border-blue-300 border-dashed"
+            )}
           />
           {isShorthandInherited() && (
             <Button
@@ -1086,7 +1270,10 @@ function AdvancedSpacingControl({
                 type="text"
                 value={getSideValue(side)}
                 onChange={(e) => handleIndividualChange(side, e.target.value)}
-                className={cn("text-sm h-9 text-center", isSideInherited(side) && "border-blue-300 border-dashed")}
+                className={cn(
+                  "text-sm h-9 text-center",
+                  isSideInherited(side) && "border-blue-300 border-dashed"
+                )}
               />
               <Label className="text-xs text-gray-500 mt-1">{side[0]}</Label>
               {isSideInherited(side) && (
@@ -1105,23 +1292,28 @@ function AdvancedSpacingControl({
         </div>
       )}
     </div>
-  )
+  );
 }
 
 function SpacingControls({ selectedElement, updateStyle }: any) {
-  const { state, dispatch } = useEditor()
-  const computedStyles = getComputedStyles(selectedElement, state.currentBreakpoint)
+  const { state, dispatch } = useEditor();
+  const computedStyles = getComputedStyles(
+    selectedElement,
+    state.currentBreakpoint
+  );
   const hasSpecificStyles =
-    state.currentBreakpoint !== "desktop" && hasBreakpointStyles(selectedElement, state.currentBreakpoint)
+    state.currentBreakpoint !== "desktop" &&
+    hasBreakpointStyles(selectedElement, state.currentBreakpoint);
 
   const resetStyle = (property: string | string[]) => {
-    if (state.currentBreakpoint === "desktop") return
+    if (state.currentBreakpoint === "desktop") return;
 
-    const currentBreakpointStyles = selectedElement.styles[state.currentBreakpoint] || {}
-    const newBreakpointStyles = { ...currentBreakpointStyles }
+    const currentBreakpointStyles =
+      selectedElement.styles[state.currentBreakpoint] || {};
+    const newBreakpointStyles = { ...currentBreakpointStyles };
 
-    const propsToReset = Array.isArray(property) ? property : [property]
-    propsToReset.forEach((prop) => delete newBreakpointStyles[prop])
+    const propsToReset = Array.isArray(property) ? property : [property];
+    propsToReset.forEach((prop) => delete newBreakpointStyles[prop]);
 
     dispatch({
       type: "UPDATE_ELEMENT",
@@ -1130,12 +1322,15 @@ function SpacingControls({ selectedElement, updateStyle }: any) {
         updates: {
           styles: {
             ...selectedElement.styles,
-            [state.currentBreakpoint]: Object.keys(newBreakpointStyles).length > 0 ? newBreakpointStyles : undefined,
+            [state.currentBreakpoint]:
+              Object.keys(newBreakpointStyles).length > 0
+                ? newBreakpointStyles
+                : undefined,
           },
         },
       },
-    })
-  }
+    });
+  };
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -1174,27 +1369,40 @@ function SpacingControls({ selectedElement, updateStyle }: any) {
         />
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function ImageControl({ selectedElement, updateAttribute, updateStyle }: any) {
-  const { state, dispatch } = useEditor()
-  const src = selectedElement.attributes?.src || ""
-  const alt = selectedElement.attributes?.alt || ""
-  const computedStyles = getComputedStyles(selectedElement, state.currentBreakpoint)
+  const { state, dispatch } = useEditor();
+  const src = selectedElement.attributes?.src || "";
+  const alt = selectedElement.attributes?.alt || "";
+  const computedStyles = getComputedStyles(
+    selectedElement,
+    state.currentBreakpoint
+  );
 
   useEffect(() => {
-    if (state.selectedAssetForStyle && selectedElement.id === state.selectedElement) {
+    if (
+      state.selectedAssetForStyle &&
+      selectedElement.id === state.selectedElement
+    ) {
       if (state.selectedAssetForStyle.type === "image") {
-        updateAttribute("src", state.selectedAssetForStyle.url)
-        dispatch({ type: "SELECT_ASSET_FOR_STYLE", payload: { asset: null } }) // Reset
+        updateAttribute("src", state.selectedAssetForStyle.url);
+        dispatch({ type: "SELECT_ASSET_FOR_STYLE", payload: { asset: null } }); // Reset
       }
     }
-  }, [state.selectedAssetForStyle, selectedElement.id, state.selectedElement, updateAttribute, dispatch])
+  }, [
+    state.selectedAssetForStyle,
+    selectedElement.id,
+    state.selectedElement,
+    updateAttribute,
+    dispatch,
+  ]);
 
-  const objectFitOptions = ["fill", "contain", "cover", "none", "scale-down"]
-  const currentObjectFit = computedStyles.objectFit || "cover"
-  const currentObjectPosition = computedStyles.objectPosition || "center center"
+  const objectFitOptions = ["fill", "contain", "cover", "none", "scale-down"];
+  const currentObjectFit = computedStyles.objectFit || "cover";
+  const currentObjectPosition =
+    computedStyles.objectPosition || "center center";
 
   return (
     <Card>
@@ -1205,7 +1413,9 @@ function ImageControl({ selectedElement, updateAttribute, updateStyle }: any) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <Label className="text-xs text-gray-600 mb-2 block">Image Source</Label>
+          <Label className="text-xs text-gray-600 mb-2 block">
+            Image Source
+          </Label>
           <div className="flex items-center gap-2">
             <div className="w-16 h-16 rounded-md bg-gray-100 flex items-center justify-center overflow-hidden">
               {src ? (
@@ -1213,7 +1423,10 @@ function ImageControl({ selectedElement, updateAttribute, updateStyle }: any) {
                   src={src || "/placeholder.svg"}
                   alt={alt}
                   className="w-full h-full"
-                  style={{ objectFit: currentObjectFit, objectPosition: currentObjectPosition }}
+                  style={{
+                    objectFit: currentObjectFit,
+                    objectPosition: currentObjectPosition,
+                  }}
                 />
               ) : (
                 <ImageIcon className="w-8 h-8 text-gray-400" />
@@ -1222,7 +1435,9 @@ function ImageControl({ selectedElement, updateAttribute, updateStyle }: any) {
             <Button
               variant="outline"
               className="flex-1"
-              onClick={() => dispatch({ type: "SET_ACTIVE_TAB", payload: { tab: "assets" } })}
+              onClick={() =>
+                dispatch({ type: "SET_ACTIVE_TAB", payload: { tab: "assets" } })
+              }
             >
               Choose from Assets
             </Button>
@@ -1244,7 +1459,10 @@ function ImageControl({ selectedElement, updateAttribute, updateStyle }: any) {
           <Label htmlFor="object-fit" className="text-xs text-gray-600">
             Object Fit
           </Label>
-          <Select value={currentObjectFit} onValueChange={(value) => updateStyle("objectFit", value)}>
+          <Select
+            value={currentObjectFit}
+            onValueChange={(value) => updateStyle("objectFit", value)}
+          >
             <SelectTrigger id="object-fit" className="mt-1">
               <SelectValue placeholder="Select fit" />
             </SelectTrigger>
@@ -1271,28 +1489,37 @@ function ImageControl({ selectedElement, updateAttribute, updateStyle }: any) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function VideoControl({ selectedElement, updateAttribute }: any) {
-  const { state, dispatch } = useEditor()
-  const src = selectedElement.attributes?.src || ""
+  const { state, dispatch } = useEditor();
+  const src = selectedElement.attributes?.src || "";
 
   useEffect(() => {
-    if (state.selectedAssetForStyle && selectedElement.id === state.selectedElement) {
+    if (
+      state.selectedAssetForStyle &&
+      selectedElement.id === state.selectedElement
+    ) {
       if (state.selectedAssetForStyle.type === "video") {
-        updateAttribute("src", state.selectedAssetForStyle.url)
-        dispatch({ type: "SELECT_ASSET_FOR_STYLE", payload: { asset: null } }) // Reset
+        updateAttribute("src", state.selectedAssetForStyle.url);
+        dispatch({ type: "SELECT_ASSET_FOR_STYLE", payload: { asset: null } }); // Reset
       }
     }
-  }, [state.selectedAssetForStyle, selectedElement.id, state.selectedElement, updateAttribute, dispatch])
+  }, [
+    state.selectedAssetForStyle,
+    selectedElement.id,
+    state.selectedElement,
+    updateAttribute,
+    dispatch,
+  ]);
 
   const videoAttributes = {
     controls: selectedElement.attributes?.controls ?? true,
     autoplay: selectedElement.attributes?.autoplay ?? false,
     loop: selectedElement.attributes?.loop ?? false,
     muted: selectedElement.attributes?.muted ?? false,
-  }
+  };
 
   return (
     <Card>
@@ -1303,10 +1530,16 @@ function VideoControl({ selectedElement, updateAttribute }: any) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <Label className="text-xs text-gray-600 mb-2 block">Video Source</Label>
+          <Label className="text-xs text-gray-600 mb-2 block">
+            Video Source
+          </Label>
           <div className="aspect-video rounded-md bg-black flex items-center justify-center overflow-hidden mb-2">
             {src ? (
-              <video src={src} controls={videoAttributes.controls} className="w-full h-full object-cover" />
+              <video
+                src={src}
+                controls={videoAttributes.controls}
+                className="w-full h-full object-cover"
+              />
             ) : (
               <Video className="w-8 h-8 text-gray-400" />
             )}
@@ -1314,7 +1547,9 @@ function VideoControl({ selectedElement, updateAttribute }: any) {
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => dispatch({ type: "SET_ACTIVE_TAB", payload: { tab: "assets" } })}
+            onClick={() =>
+              dispatch({ type: "SET_ACTIVE_TAB", payload: { tab: "assets" } })
+            }
           >
             Choose from Assets
           </Button>
@@ -1335,7 +1570,7 @@ function VideoControl({ selectedElement, updateAttribute }: any) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function ShadowEditorPopover({
@@ -1344,10 +1579,10 @@ function ShadowEditorPopover({
   onClose,
   trigger,
 }: {
-  shadow: Partial<ShadowProps>
-  onSave: (newShadow: ShadowProps) => void
-  onClose: () => void
-  trigger: React.ReactNode
+  shadow: Partial<ShadowProps>;
+  onSave: (newShadow: ShadowProps) => void;
+  onClose: () => void;
+  trigger: React.ReactNode;
 }) {
   const [editedShadow, setEditedShadow] = useState<ShadowProps>({
     offsetX: shadow.offsetX || "0px",
@@ -1356,7 +1591,7 @@ function ShadowEditorPopover({
     spreadRadius: shadow.spreadRadius || "0px",
     color: shadow.color || "rgba(0,0,0,0.5)",
     inset: shadow.inset || false,
-  })
+  });
 
   // Add this useEffect to re-initialize state when the shadow prop changes
   useEffect(() => {
@@ -1367,17 +1602,17 @@ function ShadowEditorPopover({
       spreadRadius: shadow.spreadRadius || "0px",
       color: shadow.color || "rgba(0,0,0,0.5)",
       inset: shadow.inset || false,
-    })
-  }, [shadow]) // Dependency array includes 'shadow'
+    });
+  }, [shadow]); // Dependency array includes 'shadow'
 
   const handleSave = () => {
-    onSave(editedShadow)
-    onClose()
-  }
+    onSave(editedShadow);
+    onClose();
+  };
 
   const handleChange = (field: keyof ShadowProps, value: string | boolean) => {
-    setEditedShadow((prev) => ({ ...prev, [field]: value }))
-  }
+    setEditedShadow((prev) => ({ ...prev, [field]: value }));
+  };
 
   return (
     <Popover open={true} onOpenChange={(open) => !open && onClose()}>
@@ -1458,7 +1693,11 @@ function ShadowEditorPopover({
           </div>
           <div>
             <Label className="text-xs">Color</Label>
-            <ColorPicker value={editedShadow.color} onChange={(color) => handleChange("color", color)} label="" />
+            <ColorPicker
+              value={editedShadow.color}
+              onChange={(color) => handleChange("color", color)}
+              label=""
+            />
           </div>
           <Button onClick={handleSave} className="w-full h-9">
             Apply Shadow
@@ -1466,7 +1705,7 @@ function ShadowEditorPopover({
         </div>
       </PopoverContent>
     </Popover>
-  )
+  );
 }
 
 function ShadowsControl({
@@ -1477,51 +1716,61 @@ function ShadowsControl({
   computedStyles,
   resetStyle,
 }: {
-  label: string
-  styleKey: "boxShadow" | "textShadow"
-  selectedElement: any
-  updateStyle: (property: string, value: string | number | undefined) => void
-  computedStyles: Record<string, any>
-  resetStyle: (property: string | string[]) => void
+  label: string;
+  styleKey: "boxShadow" | "textShadow";
+  selectedElement: any;
+  updateStyle: (property: string, value: string | number | undefined) => void;
+  computedStyles: Record<string, any>;
+  resetStyle: (property: string | string[]) => void;
 }) {
-  const { state } = useEditor()
-  const [editingShadow, setEditingShadow] = useState<{ index: number; shadow: Partial<ShadowProps> } | null>(null)
+  const { state } = useEditor();
+  const [editingShadow, setEditingShadow] = useState<{
+    index: number;
+    shadow: Partial<ShadowProps>;
+  } | null>(null);
 
   const parseShadowString = useCallback(
     (shadowStr: string): Partial<ShadowProps>[] => {
-      if (!shadowStr || shadowStr === "none" || typeof shadowStr !== "string") return []
+      if (!shadowStr || shadowStr === "none" || typeof shadowStr !== "string")
+        return [];
 
       // More robust splitting for multiple shadows, handling colors like rgba()
       // This regex splits by comma, but not if the comma is inside parentheses.
-      const shadowEntries = shadowStr.split(/,(?![^(]*\))/g)
+      const shadowEntries = shadowStr.split(/,(?![^(]*\))/g);
 
       return shadowEntries
         .map((sEntry) => {
-          let s = sEntry.trim()
-          let inset = false
+          let s = sEntry.trim();
+          let inset = false;
           if (styleKey === "boxShadow" && s.startsWith("inset")) {
-            inset = true
-            s = s.substring(5).trim()
+            inset = true;
+            s = s.substring(5).trim();
           }
 
           // Try to extract color first (rgb, rgba, hsl, hsla, hex, named)
           // This regex is a bit more greedy for colors.
-          const colorRegex = /(rgba?$$.+?$$|hsla?$$.+?$$|#[0-9a-fA-F]{3,8}|[a-zA-Z]+(-[a-zA-Z]+)?)$/i
-          const colorMatch = s.match(colorRegex)
+          const colorRegex =
+            /(rgba?$$.+?$$|hsla?$$.+?$$|#[0-9a-fA-F]{3,8}|[a-zA-Z]+(-[a-zA-Z]+)?)$/i;
+          const colorMatch = s.match(colorRegex);
 
-          let color = "rgba(0,0,0,0.5)" // Default color
-          let remainingStr = s
+          let color = "rgba(0,0,0,0.5)"; // Default color
+          let remainingStr = s;
 
           if (colorMatch && colorMatch[0]) {
             // Check if the matched color is a valid CSS color and not a length value
-            const potentialColor = colorMatch[0].trim()
-            if (CSS.supports("color", potentialColor) && !potentialColor.match(/px|em|rem|%|vw|vh$/)) {
-              color = potentialColor
-              remainingStr = s.substring(0, s.lastIndexOf(potentialColor)).trim()
+            const potentialColor = colorMatch[0].trim();
+            if (
+              CSS.supports("color", potentialColor) &&
+              !potentialColor.match(/px|em|rem|%|vw|vh$/)
+            ) {
+              color = potentialColor;
+              remainingStr = s
+                .substring(0, s.lastIndexOf(potentialColor))
+                .trim();
             }
           }
 
-          const parts = remainingStr.split(/\s+/).filter(Boolean)
+          const parts = remainingStr.split(/\s+/).filter(Boolean);
 
           const shadow: Partial<ShadowProps> = {
             inset,
@@ -1529,62 +1778,73 @@ function ShadowsControl({
             offsetX: parts[0] || "0px",
             offsetY: parts[1] || "0px",
             blurRadius: parts[2] || "0px",
-          }
+          };
 
           if (styleKey === "boxShadow") {
-            shadow.spreadRadius = parts[3] || "0px"
+            shadow.spreadRadius = parts[3] || "0px";
           }
-          return shadow
+          return shadow;
         })
-        .filter((shadow) => shadow.offsetX || shadow.offsetY || shadow.blurRadius) // Filter out empty/invalid shadows
+        .filter(
+          (shadow) => shadow.offsetX || shadow.offsetY || shadow.blurRadius
+        ); // Filter out empty/invalid shadows
     },
-    [styleKey],
-  )
+    [styleKey]
+  );
 
   const formatShadowToString = useCallback(
     (shadow: ShadowProps): string => {
-      let str = ""
+      let str = "";
       if (styleKey === "boxShadow" && shadow.inset) {
-        str += "inset "
+        str += "inset ";
       }
-      str += `${shadow.offsetX || "0px"} ${shadow.offsetY || "0px"} ${shadow.blurRadius || "0px"}`
+      str += `${shadow.offsetX || "0px"} ${shadow.offsetY || "0px"} ${
+        shadow.blurRadius || "0px"
+      }`;
       if (styleKey === "boxShadow") {
-        str += ` ${shadow.spreadRadius || "0px"}`
+        str += ` ${shadow.spreadRadius || "0px"}`;
       }
-      str += ` ${shadow.color || "rgba(0,0,0,0.5)"}`
-      return str
+      str += ` ${shadow.color || "rgba(0,0,0,0.5)"}`;
+      return str;
     },
-    [styleKey],
-  )
+    [styleKey]
+  );
 
-  const shadows = parseShadowString(computedStyles[styleKey] || "")
+  const shadows = parseShadowString(computedStyles[styleKey] || "");
 
   const handleSaveShadow = (index: number, newShadowData: ShadowProps) => {
-    const newShadowsArray = [...shadows]
+    const newShadowsArray = [...shadows];
     const completeShadowData = {
       offsetX: newShadowData.offsetX || "0px",
       offsetY: newShadowData.offsetY || "0px",
       blurRadius: newShadowData.blurRadius || "0px",
-      spreadRadius: styleKey === "boxShadow" ? newShadowData.spreadRadius || "0px" : undefined,
+      spreadRadius:
+        styleKey === "boxShadow"
+          ? newShadowData.spreadRadius || "0px"
+          : undefined,
       color: newShadowData.color || "rgba(0,0,0,0.5)",
       inset: styleKey === "boxShadow" ? newShadowData.inset || false : false,
-    }
+    };
 
     if (index === -1) {
-      newShadowsArray.push(completeShadowData)
+      newShadowsArray.push(completeShadowData);
     } else {
-      newShadowsArray[index] = completeShadowData
+      newShadowsArray[index] = completeShadowData;
     }
-    const newShadowString = newShadowsArray.map((s) => formatShadowToString(s as ShadowProps)).join(", ")
-    updateStyle(styleKey, newShadowString || "none")
-    setEditingShadow(null)
-  }
+    const newShadowString = newShadowsArray
+      .map((s) => formatShadowToString(s as ShadowProps))
+      .join(", ");
+    updateStyle(styleKey, newShadowString || "none");
+    setEditingShadow(null);
+  };
 
   const handleRemoveShadow = (index: number) => {
-    const newShadowsArray = shadows.filter((_, i) => i !== index)
-    const newShadowString = newShadowsArray.map((s) => formatShadowToString(s as ShadowProps)).join(", ")
-    updateStyle(styleKey, newShadowString || "none")
-  }
+    const newShadowsArray = shadows.filter((_, i) => i !== index);
+    const newShadowString = newShadowsArray
+      .map((s) => formatShadowToString(s as ShadowProps))
+      .join(", ");
+    updateStyle(styleKey, newShadowString || "none");
+  };
 
   const handleAddNewShadow = () => {
     const defaultShadow: Partial<ShadowProps> = {
@@ -1593,15 +1853,16 @@ function ShadowsControl({
       blurRadius: "4px",
       color: "rgba(0,0,0,0.1)",
       inset: false,
-    }
+    };
     if (styleKey === "boxShadow") {
-      defaultShadow.spreadRadius = "0px"
+      defaultShadow.spreadRadius = "0px";
     }
-    setEditingShadow({ index: -1, shadow: defaultShadow })
-  }
+    setEditingShadow({ index: -1, shadow: defaultShadow });
+  };
 
   const isInherited =
-    state.currentBreakpoint !== "desktop" && !selectedElement.styles[state.currentBreakpoint]?.[styleKey]
+    state.currentBreakpoint !== "desktop" &&
+    !selectedElement.styles[state.currentBreakpoint]?.[styleKey];
 
   return (
     <div>
@@ -1619,21 +1880,40 @@ function ShadowsControl({
               <RotateCcw className="w-3 h-3" />
             </Button>
           )}
-          <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={handleAddNewShadow}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 w-7 p-0"
+            onClick={handleAddNewShadow}
+          >
             <PlusCircle className="w-4 h-4" />
           </Button>
         </div>
       </div>
-      {shadows.length === 0 && <p className="text-xs text-gray-400">No {label.toLowerCase()} applied.</p>}
+      {shadows.length === 0 && (
+        <p className="text-xs text-gray-400">
+          No {label.toLowerCase()} applied.
+        </p>
+      )}
       <div className="space-y-2">
         {shadows.map((shadow, index) => (
-          <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded text-xs">
-            <span className="truncate w-40" title={formatShadowToString(shadow as ShadowProps)}>
+          <div
+            key={index}
+            className="flex items-center justify-between p-2 bg-gray-50 rounded text-xs"
+          >
+            <span
+              className="truncate w-40"
+              title={formatShadowToString(shadow as ShadowProps)}
+            >
               {styleKey === "boxShadow" && shadow.inset && "Inset "}
-              {shadow.offsetX} {shadow.offsetY} {shadow.blurRadius} {styleKey === "boxShadow" && shadow.spreadRadius}
+              {shadow.offsetX} {shadow.offsetY} {shadow.blurRadius}{" "}
+              {styleKey === "boxShadow" && shadow.spreadRadius}
             </span>
             <div className="flex items-center gap-1">
-              <div className="w-4 h-4 rounded border" style={{ backgroundColor: shadow.color }}></div>
+              <div
+                className="w-4 h-4 rounded border"
+                style={{ backgroundColor: shadow.color }}
+              ></div>
               <Button
                 variant="ghost"
                 size="icon"
@@ -1641,33 +1921,51 @@ function ShadowsControl({
                 onClick={() =>
                   setEditingShadow({
                     index,
-                    shadow: { ...shadow, spreadRadius: styleKey === "boxShadow" ? shadow.spreadRadius : undefined },
+                    shadow: {
+                      ...shadow,
+                      spreadRadius:
+                        styleKey === "boxShadow"
+                          ? shadow.spreadRadius
+                          : undefined,
+                    },
                   })
                 }
               >
                 <Edit2 className="w-3 h-3" />
               </Button>
-              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleRemoveShadow(index)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={() => handleRemoveShadow(index)}
+              >
                 <Trash2 className="w-3 h-3 text-red-500" />
               </Button>
             </div>
           </div>
         ))}
       </div>
-      {isInherited && shadows.length > 0 && <p className="text-xs text-blue-600 mt-1">Inherited from desktop</p>}
+      {isInherited && shadows.length > 0 && (
+        <p className="text-xs text-blue-600 mt-1">Inherited from desktop</p>
+      )}
       {editingShadow !== null && (
         <ShadowEditorPopover
           shadow={{
             ...editingShadow.shadow,
-            spreadRadius: styleKey === "boxShadow" ? editingShadow.shadow.spreadRadius : undefined,
+            spreadRadius:
+              styleKey === "boxShadow"
+                ? editingShadow.shadow.spreadRadius
+                : undefined,
           }}
-          onSave={(newShadowData) => handleSaveShadow(editingShadow.index, newShadowData)}
+          onSave={(newShadowData) =>
+            handleSaveShadow(editingShadow.index, newShadowData)
+          }
           onClose={() => setEditingShadow(null)}
           trigger={<></>}
         />
       )}
     </div>
-  )
+  );
 }
 
 function AdvancedBorderControl({
@@ -1676,85 +1974,120 @@ function AdvancedBorderControl({
   computedStyles,
   resetStyle,
 }: {
-  selectedElement: any
-  updateStyle: (property: string, value: string | number | undefined) => void
-  computedStyles: Record<string, any>
-  resetStyle: (property: string | string[]) => void
+  selectedElement: any;
+  updateStyle: (property: string, value: string | number | undefined) => void;
+  computedStyles: Record<string, any>;
+  resetStyle: (property: string | string[]) => void;
 }) {
-  const { state, dispatch } = useEditor() // Use dispatch from context
-  const [isLinked, setIsLinked] = useState(true)
-  const sides = ["Top", "Right", "Bottom", "Left"] as const
-  const borderStyles = ["solid", "dashed", "dotted", "double", "groove", "ridge", "inset", "outset", "none"]
+  const { state, dispatch } = useEditor(); // Use dispatch from context
+  const [isLinked, setIsLinked] = useState(true);
+  const sides = ["Top", "Right", "Bottom", "Left"] as const;
+  const borderStyles = [
+    "solid",
+    "dashed",
+    "dotted",
+    "double",
+    "groove",
+    "ridge",
+    "inset",
+    "outset",
+    "none",
+  ];
 
-  const handleShorthandChange = (property: "borderWidth" | "borderStyle" | "borderColor", value: string) => {
-    const updates: Record<string, string | undefined> = {}
+  const handleShorthandChange = (
+    property: "borderWidth" | "borderStyle" | "borderColor",
+    value: string
+  ) => {
+    const updates: Record<string, string | undefined> = {};
 
     // Determine the base property being changed
     if (property === "borderWidth") {
-      updates.borderWidth = value
-      updates.borderStyle = computedStyles.borderStyle || "solid"
-      updates.borderColor = computedStyles.borderColor || "#000000"
+      updates.borderWidth = value;
+      updates.borderStyle = computedStyles.borderStyle || "solid";
+      updates.borderColor = computedStyles.borderColor || "#000000";
     } else if (property === "borderStyle") {
-      updates.borderWidth = computedStyles.borderWidth || "0px"
-      updates.borderStyle = value
-      updates.borderColor = computedStyles.borderColor || "#000000"
+      updates.borderWidth = computedStyles.borderWidth || "0px";
+      updates.borderStyle = value;
+      updates.borderColor = computedStyles.borderColor || "#000000";
     } else {
       // borderColor
-      updates.borderWidth = computedStyles.borderWidth || "0px"
-      updates.borderStyle = computedStyles.borderStyle || "solid"
-      updates.borderColor = value
+      updates.borderWidth = computedStyles.borderWidth || "0px";
+      updates.borderStyle = computedStyles.borderStyle || "solid";
+      updates.borderColor = value;
     }
 
     // If value is '0px' for width or 'none' for style, reset all border properties
-    if ((property === "borderWidth" && value === "0px") || (property === "borderStyle" && value === "none")) {
-      updates.borderWidth = property === "borderWidth" ? value : "0px"
-      updates.borderStyle = property === "borderStyle" ? value : "none"
-      updates.borderColor = "transparent" // Or keep existing color? User expectation might vary.
+    if (
+      (property === "borderWidth" && value === "0px") ||
+      (property === "borderStyle" && value === "none")
+    ) {
+      updates.borderWidth = property === "borderWidth" ? value : "0px";
+      updates.borderStyle = property === "borderStyle" ? value : "none";
+      updates.borderColor = "transparent"; // Or keep existing color? User expectation might vary.
       // For now, let's make it transparent if width is 0 or style is none.
       sides.forEach((side) => {
-        updates[`border${side}Width`] = updates.borderWidth
-        updates[`border${side}Style`] = updates.borderStyle
-        updates[`border${side}Color`] = updates.borderColor
-      })
+        updates[`border${side}Width`] = updates.borderWidth;
+        updates[`border${side}Style`] = updates.borderStyle;
+        updates[`border${side}Color`] = updates.borderColor;
+      });
     } else {
       // Apply to all sides if linked
       sides.forEach((side) => {
-        updates[`border${side}Width`] = updates.borderWidth
-        updates[`border${side}Style`] = updates.borderStyle
-        updates[`border${side}Color`] = updates.borderColor
-      })
+        updates[`border${side}Width`] = updates.borderWidth;
+        updates[`border${side}Style`] = updates.borderStyle;
+        updates[`border${side}Color`] = updates.borderColor;
+      });
     }
 
     dispatch({
       type: "UPDATE_ELEMENT_STYLES",
-      payload: { id: selectedElement.id, breakpoint: state.currentBreakpoint, styles: updates },
-    })
-  }
+      payload: {
+        id: selectedElement.id,
+        breakpoint: state.currentBreakpoint,
+        styles: updates,
+      },
+    });
+  };
 
   const handleIndividualChange = (
     side: (typeof sides)[number],
     propertySuffix: "Width" | "Style" | "Color",
-    value: string,
+    value: string
   ) => {
-    updateStyle(`border${side}${propertySuffix}`, value)
-  }
+    updateStyle(`border${side}${propertySuffix}`, value);
+  };
 
-  const getShorthandValue = (property: "borderWidth" | "borderStyle" | "borderColor"): string => {
+  const getShorthandValue = (
+    property: "borderWidth" | "borderStyle" | "borderColor"
+  ): string => {
     return (
       computedStyles[property] ||
-      (property === "borderWidth" ? "0px" : property === "borderStyle" ? "solid" : "#000000")
-    )
-  }
+      (property === "borderWidth"
+        ? "0px"
+        : property === "borderStyle"
+        ? "solid"
+        : "#000000")
+    );
+  };
 
-  const getSideValue = (side: (typeof sides)[number], propertySuffix: "Width" | "Style" | "Color"): string => {
-    return computedStyles[`border${side}${propertySuffix}`] || getShorthandValue(`border${propertySuffix}` as any)
-  }
+  const getSideValue = (
+    side: (typeof sides)[number],
+    propertySuffix: "Width" | "Style" | "Color"
+  ): string => {
+    return (
+      computedStyles[`border${side}${propertySuffix}`] ||
+      getShorthandValue(`border${propertySuffix}` as any)
+    );
+  };
 
   const isShorthandInherited = (property: string) =>
-    state.currentBreakpoint !== "desktop" && !selectedElement.styles[state.currentBreakpoint]?.[property]
+    state.currentBreakpoint !== "desktop" &&
+    !selectedElement.styles[state.currentBreakpoint]?.[property];
   const isSideInherited = (side: string, propertySuffix: string) =>
     state.currentBreakpoint !== "desktop" &&
-    !selectedElement.styles[state.currentBreakpoint]?.[`border${side}${propertySuffix}`]
+    !selectedElement.styles[state.currentBreakpoint]?.[
+      `border${side}${propertySuffix}`
+    ];
 
   return (
     <div>
@@ -1788,10 +2121,13 @@ function AdvancedBorderControl({
             <Input
               type="text"
               value={getShorthandValue("borderWidth")}
-              onChange={(e) => handleShorthandChange("borderWidth", e.target.value)}
+              onChange={(e) =>
+                handleShorthandChange("borderWidth", e.target.value)
+              }
               className={cn(
                 "text-sm h-9 w-1/3",
-                isShorthandInherited("borderWidth") && "border-blue-300 border-dashed",
+                isShorthandInherited("borderWidth") &&
+                  "border-blue-300 border-dashed"
               )}
               placeholder="0px"
             />
@@ -1802,7 +2138,8 @@ function AdvancedBorderControl({
               <SelectTrigger
                 className={cn(
                   "text-sm h-9 w-1/3",
-                  isShorthandInherited("borderStyle") && "border-blue-300 border-dashed",
+                  isShorthandInherited("borderStyle") &&
+                    "border-blue-300 border-dashed"
                 )}
               >
                 <SelectValue />
@@ -1829,30 +2166,43 @@ function AdvancedBorderControl({
           {(isShorthandInherited("borderWidth") ||
             isShorthandInherited("borderStyle") ||
             isShorthandInherited("borderColor")) && (
-            <p className="text-xs text-blue-600 mt-1">One or more border properties inherited.</p>
+            <p className="text-xs text-blue-600 mt-1">
+              One or more border properties inherited.
+            </p>
           )}
         </div>
       ) : (
         <div className="space-y-3">
           {sides.map((side) => (
             <div key={side}>
-              <Label className="text-xs text-gray-500 mb-1 block">{side} Border</Label>
+              <Label className="text-xs text-gray-500 mb-1 block">
+                {side} Border
+              </Label>
               <div className="flex items-center gap-2">
                 <Input
                   type="text"
                   value={getSideValue(side, "Width")}
-                  onChange={(e) => handleIndividualChange(side, "Width", e.target.value)}
-                  className={cn("text-sm h-9 w-1/3", isSideInherited(side, "Width") && "border-blue-300 border-dashed")}
+                  onChange={(e) =>
+                    handleIndividualChange(side, "Width", e.target.value)
+                  }
+                  className={cn(
+                    "text-sm h-9 w-1/3",
+                    isSideInherited(side, "Width") &&
+                      "border-blue-300 border-dashed"
+                  )}
                   placeholder="Width"
                 />
                 <Select
                   value={getSideValue(side, "Style")}
-                  onValueChange={(val) => handleIndividualChange(side, "Style", val)}
+                  onValueChange={(val) =>
+                    handleIndividualChange(side, "Style", val)
+                  }
                 >
                   <SelectTrigger
                     className={cn(
                       "text-sm h-9 w-1/3",
-                      isSideInherited(side, "Style") && "border-blue-300 border-dashed",
+                      isSideInherited(side, "Style") &&
+                        "border-blue-300 border-dashed"
                     )}
                   >
                     <SelectValue />
@@ -1876,15 +2226,19 @@ function AdvancedBorderControl({
                   popoverAlign="end"
                 />
               </div>
-              {(isSideInherited(side, "Width") || isSideInherited(side, "Style") || isSideInherited(side, "Color")) && (
-                <p className="text-xs text-blue-600 mt-1">{side} border properties may be inherited.</p>
+              {(isSideInherited(side, "Width") ||
+                isSideInherited(side, "Style") ||
+                isSideInherited(side, "Color")) && (
+                <p className="text-xs text-blue-600 mt-1">
+                  {side} border properties may be inherited.
+                </p>
               )}
             </div>
           ))}
         </div>
       )}
     </div>
-  )
+  );
 }
 
 function AdvancedBorderRadiusControl({
@@ -1893,44 +2247,55 @@ function AdvancedBorderRadiusControl({
   computedStyles,
   resetStyle,
 }: {
-  selectedElement: any
-  updateStyle: (property: string, value: string | number | undefined) => void
-  computedStyles: Record<string, any>
-  resetStyle: (property: string | string[]) => void
+  selectedElement: any;
+  updateStyle: (property: string, value: string | number | undefined) => void;
+  computedStyles: Record<string, any>;
+  resetStyle: (property: string | string[]) => void;
 }) {
-  const { state, dispatch } = useEditor() // Use dispatch from context
-  const [isLinked, setIsLinked] = useState(true)
-  const corners = ["TopLeft", "TopRight", "BottomRight", "BottomLeft"] as const
+  const { state, dispatch } = useEditor(); // Use dispatch from context
+  const [isLinked, setIsLinked] = useState(true);
+  const corners = ["TopLeft", "TopRight", "BottomRight", "BottomLeft"] as const;
 
   const handleShorthandChange = (value: string) => {
-    const updates: Record<string, string> = { borderRadius: value }
+    const updates: Record<string, string> = { borderRadius: value };
     corners.forEach((corner) => {
-      updates[`border${corner}Radius`] = value
-    })
+      updates[`border${corner}Radius`] = value;
+    });
     dispatch({
       // Correctly use dispatch from context
       type: "UPDATE_ELEMENT_STYLES",
-      payload: { id: selectedElement.id, breakpoint: state.currentBreakpoint, styles: updates },
-    })
-  }
+      payload: {
+        id: selectedElement.id,
+        breakpoint: state.currentBreakpoint,
+        styles: updates,
+      },
+    });
+  };
 
-  const handleIndividualChange = (corner: (typeof corners)[number], value: string) => {
-    updateStyle(`border${corner}Radius`, value)
-  }
+  const handleIndividualChange = (
+    corner: (typeof corners)[number],
+    value: string
+  ) => {
+    updateStyle(`border${corner}Radius`, value);
+  };
 
-  const getShorthandValue = (): string => computedStyles.borderRadius || "0px"
+  const getShorthandValue = (): string => computedStyles.borderRadius || "0px";
   const getCornerValue = (corner: (typeof corners)[number]): string =>
-    computedStyles[`border${corner}Radius`] || getShorthandValue()
+    computedStyles[`border${corner}Radius`] || getShorthandValue();
 
   const isShorthandInherited = () =>
-    state.currentBreakpoint !== "desktop" && !selectedElement.styles[state.currentBreakpoint]?.borderRadius
+    state.currentBreakpoint !== "desktop" &&
+    !selectedElement.styles[state.currentBreakpoint]?.borderRadius;
   const isCornerInherited = (corner: string) =>
-    state.currentBreakpoint !== "desktop" && !selectedElement.styles[state.currentBreakpoint]?.[`border${corner}Radius`]
+    state.currentBreakpoint !== "desktop" &&
+    !selectedElement.styles[state.currentBreakpoint]?.[`border${corner}Radius`];
 
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <Label className="text-sm font-medium text-gray-700">Border Radius</Label>
+        <Label className="text-sm font-medium text-gray-700">
+          Border Radius
+        </Label>
         <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
           <Button
             variant={isLinked ? "default" : "ghost"}
@@ -1958,7 +2323,10 @@ function AdvancedBorderRadiusControl({
             type="text"
             value={getShorthandValue()}
             onChange={(e) => handleShorthandChange(e.target.value)}
-            className={cn("text-sm h-9", isShorthandInherited() && "border-blue-300 border-dashed")}
+            className={cn(
+              "text-sm h-9",
+              isShorthandInherited() && "border-blue-300 border-dashed"
+            )}
           />
           {isShorthandInherited() && (
             <Button
@@ -1976,12 +2344,17 @@ function AdvancedBorderRadiusControl({
         <div className="grid grid-cols-2 gap-x-2 gap-y-3">
           {corners.map((corner) => (
             <div key={corner} className="relative">
-              <Label className="text-xs text-gray-500 mb-1 block">{corner.replace(/([A-Z])/g, " $1").trim()}</Label>
+              <Label className="text-xs text-gray-500 mb-1 block">
+                {corner.replace(/([A-Z])/g, " $1").trim()}
+              </Label>
               <Input
                 type="text"
                 value={getCornerValue(corner)}
                 onChange={(e) => handleIndividualChange(corner, e.target.value)}
-                className={cn("text-sm h-9", isCornerInherited(corner) && "border-blue-300 border-dashed")}
+                className={cn(
+                  "text-sm h-9",
+                  isCornerInherited(corner) && "border-blue-300 border-dashed"
+                )}
               />
               {isCornerInherited(corner) && (
                 <Button
@@ -1999,7 +2372,7 @@ function AdvancedBorderRadiusControl({
         </div>
       )}
     </div>
-  )
+  );
 }
 
 const filterTypes = [
@@ -2012,16 +2385,21 @@ const filterTypes = [
   { value: "opacity", label: "Opacity", unit: "%", default: "100" },
   { value: "saturate", label: "Saturate", unit: "%", default: "100" },
   { value: "sepia", label: "Sepia", unit: "%", default: "0" },
-  // { value: "drop-shadow", label: "Drop Shadow", unit: "", default: "0px 0px 0px #000" }, // More complex
-] as const
+  {
+    value: "drop-shadow",
+    label: "Drop Shadow",
+    unit: "",
+    default: "0px 0px 0px #000",
+  }, // More complex
+] as const;
 
-type FilterTypeValue = (typeof filterTypes)[number]["value"]
+type FilterTypeValue = (typeof filterTypes)[number]["value"];
 
 interface FilterItem {
-  id: string
-  type: FilterTypeValue
-  value: string
-  unit: string
+  id: string;
+  type: FilterTypeValue;
+  value: string;
+  unit: string;
 }
 
 function FiltersControl({
@@ -2030,49 +2408,56 @@ function FiltersControl({
   computedStyles,
   resetStyle,
 }: {
-  selectedElement: any
-  updateStyle: (property: string, value: string | undefined) => void
-  computedStyles: Record<string, any>
-  resetStyle: (property: string) => void
+  selectedElement: any;
+  updateStyle: (property: string, value: string | undefined) => void;
+  computedStyles: Record<string, any>;
+  resetStyle: (property: string) => void;
 }) {
-  const { state } = useEditor()
-  const [filters, setFilters] = useState<FilterItem[]>([])
+  const { state } = useEditor();
+  const [filters, setFilters] = useState<FilterItem[]>([]);
 
   useEffect(() => {
-    const filterString = computedStyles.filter || ""
+    const filterString = computedStyles.filter || "";
     if (filterString === "none" || !filterString) {
-      setFilters([])
-      return
+      setFilters([]);
+      return;
     }
     const parsedFilters: FilterItem[] = filterString
       .split(/\)\s+/) // Split by closing parenthesis followed by space
       .map((fStr: string) => {
-        if (!fStr.includes("(")) return null
-        const [typeMatch, valueMatch] = fStr.split("(")
-        if (!typeMatch || !valueMatch) return null
+        if (!fStr.includes("(")) return null;
+        const [typeMatch, valueMatch] = fStr.split("(");
+        if (!typeMatch || !valueMatch) return null;
 
-        const type = typeMatch.trim() as FilterTypeValue
-        const valueWithUnit = valueMatch.replace(")", "").trim()
+        const type = typeMatch.trim() as FilterTypeValue;
+        const valueWithUnit = valueMatch.replace(")", "").trim();
 
-        const filterDefinition = filterTypes.find((ft) => ft.value === type)
-        if (!filterDefinition) return null
+        const filterDefinition = filterTypes.find((ft) => ft.value === type);
+        if (!filterDefinition) return null;
 
-        const unit = filterDefinition.unit
-        const value = valueWithUnit.replace(unit, "")
+        const unit = filterDefinition.unit;
+        const value = valueWithUnit.replace(unit, "");
 
-        return { id: Math.random().toString(36).substr(2, 9), type, value, unit }
+        return {
+          id: Math.random().toString(36).substr(2, 9),
+          type,
+          value,
+          unit,
+        };
       })
-      .filter((f: FilterItem | null): f is FilterItem => f !== null)
-    setFilters(parsedFilters)
-  }, [computedStyles.filter])
+      .filter((f: FilterItem | null): f is FilterItem => f !== null);
+    setFilters(parsedFilters);
+  }, [computedStyles.filter]);
 
   const updateFilterString = (updatedFilters: FilterItem[]) => {
-    const newFilterString = updatedFilters.map((f) => `${f.type}(${f.value}${f.unit})`).join(" ")
-    updateStyle("filter", newFilterString || "none")
-  }
+    const newFilterString = updatedFilters
+      .map((f) => `${f.type}(${f.value}${f.unit})`)
+      .join(" ");
+    updateStyle("filter", newFilterString || "none");
+  };
 
   const handleAddFilter = () => {
-    const defaultFilterType = filterTypes[0]
+    const defaultFilterType = filterTypes[0];
     setFilters([
       ...filters,
       {
@@ -2081,36 +2466,44 @@ function FiltersControl({
         value: defaultFilterType.default,
         unit: defaultFilterType.unit,
       },
-    ])
-  }
+    ]);
+  };
 
   const handleRemoveFilter = (id: string) => {
-    const updatedFilters = filters.filter((f) => f.id !== id)
-    setFilters(updatedFilters)
-    updateFilterString(updatedFilters)
-  }
+    const updatedFilters = filters.filter((f) => f.id !== id);
+    setFilters(updatedFilters);
+    updateFilterString(updatedFilters);
+  };
 
-  const handleFilterChange = (id: string, field: "type" | "value", newValue: string) => {
+  const handleFilterChange = (
+    id: string,
+    field: "type" | "value",
+    newValue: string
+  ) => {
     const updatedFilters = filters.map((f) => {
       if (f.id === id) {
         if (field === "type") {
-          const newTypeDefinition = filterTypes.find((ft) => ft.value === newValue)
+          const newTypeDefinition = filterTypes.find(
+            (ft) => ft.value === newValue
+          );
           return {
             ...f,
             type: newValue as FilterTypeValue,
             value: newTypeDefinition?.default || f.value,
             unit: newTypeDefinition?.unit || f.unit,
-          }
+          };
         }
-        return { ...f, [field]: newValue }
+        return { ...f, [field]: newValue };
       }
-      return f
-    })
-    setFilters(updatedFilters)
-    updateFilterString(updatedFilters)
-  }
+      return f;
+    });
+    setFilters(updatedFilters);
+    updateFilterString(updatedFilters);
+  };
 
-  const isInherited = state.currentBreakpoint !== "desktop" && !selectedElement.styles[state.currentBreakpoint]?.filter
+  const isInherited =
+    state.currentBreakpoint !== "desktop" &&
+    !selectedElement.styles[state.currentBreakpoint]?.filter;
 
   return (
     <div>
@@ -2128,16 +2521,31 @@ function FiltersControl({
               <RotateCcw className="w-3 h-3" />
             </Button>
           )}
-          <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={handleAddFilter}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 w-7 p-0"
+            onClick={handleAddFilter}
+          >
             <PlusCircle className="w-4 h-4" />
           </Button>
         </div>
       </div>
-      {filters.length === 0 && <p className="text-xs text-gray-400">No filters applied.</p>}
+      {filters.length === 0 && (
+        <p className="text-xs text-gray-400">No filters applied.</p>
+      )}
       <div className="space-y-3">
         {filters.map((filter) => (
-          <div key={filter.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-            <Select value={filter.type} onValueChange={(val) => handleFilterChange(filter.id, "type", val)}>
+          <div
+            key={filter.id}
+            className="flex items-center gap-2 p-2 bg-gray-50 rounded"
+          >
+            <Select
+              value={filter.type}
+              onValueChange={(val) =>
+                handleFilterChange(filter.id, "type", val)
+              }
+            >
               <SelectTrigger className="text-xs h-8 w-[120px]">
                 <SelectValue />
               </SelectTrigger>
@@ -2152,36 +2560,55 @@ function FiltersControl({
             <Input
               type="text" // Changed to text to allow easier input of various values
               value={filter.value}
-              onChange={(e) => handleFilterChange(filter.id, "value", e.target.value)}
+              onChange={(e) =>
+                handleFilterChange(filter.id, "value", e.target.value)
+              }
               className="text-xs h-8 flex-grow"
-              placeholder={filterTypes.find((f) => f.value === filter.type)?.default || "value"}
+              placeholder={
+                filterTypes.find((f) => f.value === filter.type)?.default ||
+                "value"
+              }
             />
-            {filter.unit && <span className="text-xs text-gray-500">{filter.unit}</span>}
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleRemoveFilter(filter.id)}>
+            {filter.unit && (
+              <span className="text-xs text-gray-500">{filter.unit}</span>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => handleRemoveFilter(filter.id)}
+            >
               <MinusCircle className="w-4 h-4 text-red-500" />
             </Button>
           </div>
         ))}
       </div>
-      {isInherited && filters.length > 0 && <p className="text-xs text-blue-600 mt-1">Inherited from desktop</p>}
+      {isInherited && filters.length > 0 && (
+        <p className="text-xs text-blue-600 mt-1">Inherited from desktop</p>
+      )}
     </div>
-  )
+  );
 }
 
 function AppearanceControls({ selectedElement, updateStyle }: any) {
-  const { state, dispatch } = useEditor()
-  const computedStyles = getComputedStyles(selectedElement, state.currentBreakpoint)
+  const { state, dispatch } = useEditor();
+  const computedStyles = getComputedStyles(
+    selectedElement,
+    state.currentBreakpoint
+  );
   const hasSpecificStyles =
-    state.currentBreakpoint !== "desktop" && hasBreakpointStyles(selectedElement, state.currentBreakpoint)
+    state.currentBreakpoint !== "desktop" &&
+    hasBreakpointStyles(selectedElement, state.currentBreakpoint);
 
   const resetStyleToDesktop = (property: string | string[]) => {
-    if (state.currentBreakpoint === "desktop") return
+    if (state.currentBreakpoint === "desktop") return;
 
-    const currentBreakpointStyles = selectedElement.styles[state.currentBreakpoint] || {}
-    const newBreakpointStyles = { ...currentBreakpointStyles }
+    const currentBreakpointStyles =
+      selectedElement.styles[state.currentBreakpoint] || {};
+    const newBreakpointStyles = { ...currentBreakpointStyles };
 
-    const propsToReset = Array.isArray(property) ? property : [property]
-    propsToReset.forEach((prop) => delete newBreakpointStyles[prop])
+    const propsToReset = Array.isArray(property) ? property : [property];
+    propsToReset.forEach((prop) => delete newBreakpointStyles[prop]);
 
     dispatch({
       type: "UPDATE_ELEMENT",
@@ -2190,26 +2617,42 @@ function AppearanceControls({ selectedElement, updateStyle }: any) {
         updates: {
           styles: {
             ...selectedElement.styles,
-            [state.currentBreakpoint]: Object.keys(newBreakpointStyles).length > 0 ? newBreakpointStyles : undefined,
+            [state.currentBreakpoint]:
+              Object.keys(newBreakpointStyles).length > 0
+                ? newBreakpointStyles
+                : undefined,
           },
         },
       },
-    })
-  }
+    });
+  };
 
   const isBgColorInherited =
-    state.currentBreakpoint !== "desktop" && !selectedElement.styles[state.currentBreakpoint]?.backgroundColor
+    state.currentBreakpoint !== "desktop" &&
+    !selectedElement.styles[state.currentBreakpoint]?.backgroundColor;
 
   const handleBgImageFromAssets = () => {
-    dispatch({ type: "SET_ACTIVE_TAB", payload: { tab: "assets" } })
-  }
+    dispatch({ type: "SET_ACTIVE_TAB", payload: { tab: "assets" } });
+  };
 
   useEffect(() => {
-    if (state.selectedAssetForStyle && selectedElement.id === state.selectedElement) {
-      updateStyle("backgroundImage", `url('${state.selectedAssetForStyle.url}')`)
-      dispatch({ type: "SELECT_ASSET_FOR_STYLE", payload: { asset: null } })
+    if (
+      state.selectedAssetForStyle &&
+      selectedElement.id === state.selectedElement
+    ) {
+      updateStyle(
+        "backgroundImage",
+        `url('${state.selectedAssetForStyle.url}')`
+      );
+      dispatch({ type: "SELECT_ASSET_FOR_STYLE", payload: { asset: null } });
     }
-  }, [state.selectedAssetForStyle, selectedElement.id, state.selectedElement, updateStyle, dispatch])
+  }, [
+    state.selectedAssetForStyle,
+    selectedElement.id,
+    state.selectedElement,
+    updateStyle,
+    dispatch,
+  ]);
 
   return (
     <Card>
@@ -2272,7 +2715,9 @@ function AppearanceControls({ selectedElement, updateStyle }: any) {
         />
 
         <div>
-          <Label className="text-sm font-medium text-gray-700 mb-2 block">Background Image</Label>
+          <Label className="text-sm font-medium text-gray-700 mb-2 block">
+            Background Image
+          </Label>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Input
@@ -2324,7 +2769,9 @@ function AppearanceControls({ selectedElement, updateStyle }: any) {
                 type="text"
                 placeholder="Position"
                 value={computedStyles.backgroundPosition || ""}
-                onChange={(e) => updateStyle("backgroundPosition", e.target.value)}
+                onChange={(e) =>
+                  updateStyle("backgroundPosition", e.target.value)
+                }
                 className="text-xs h-9"
               />
             </div>
@@ -2333,15 +2780,23 @@ function AppearanceControls({ selectedElement, updateStyle }: any) {
 
         <div>
           <div className="flex items-center justify-between mb-1">
-            <Label className="text-sm font-medium text-gray-700">Overflow</Label>
+            <Label className="text-sm font-medium text-gray-700">
+              Overflow
+            </Label>
             {/* Add reset button if needed */}
           </div>
           <div className="grid grid-cols-3 gap-2">
             <div>
-              <Label htmlFor="overflow-all" className="text-xs text-gray-500 mb-1 block">
+              <Label
+                htmlFor="overflow-all"
+                className="text-xs text-gray-500 mb-1 block"
+              >
                 Overall
               </Label>
-              <Select value={computedStyles.overflow || "visible"} onValueChange={(v) => updateStyle("overflow", v)}>
+              <Select
+                value={computedStyles.overflow || "visible"}
+                onValueChange={(v) => updateStyle("overflow", v)}
+              >
                 <SelectTrigger id="overflow-all" className="text-xs h-9">
                   <SelectValue placeholder="All" />
                 </SelectTrigger>
@@ -2355,10 +2810,16 @@ function AppearanceControls({ selectedElement, updateStyle }: any) {
               </Select>
             </div>
             <div>
-              <Label htmlFor="overflow-x" className="text-xs text-gray-500 mb-1 block">
+              <Label
+                htmlFor="overflow-x"
+                className="text-xs text-gray-500 mb-1 block"
+              >
                 X-Axis
               </Label>
-              <Select value={computedStyles.overflowX || "visible"} onValueChange={(v) => updateStyle("overflowX", v)}>
+              <Select
+                value={computedStyles.overflowX || "visible"}
+                onValueChange={(v) => updateStyle("overflowX", v)}
+              >
                 <SelectTrigger id="overflow-x" className="text-xs h-9">
                   <SelectValue placeholder="X Axis" />
                 </SelectTrigger>
@@ -2372,10 +2833,16 @@ function AppearanceControls({ selectedElement, updateStyle }: any) {
               </Select>
             </div>
             <div>
-              <Label htmlFor="overflow-y" className="text-xs text-gray-500 mb-1 block">
+              <Label
+                htmlFor="overflow-y"
+                className="text-xs text-gray-500 mb-1 block"
+              >
                 Y-Axis
               </Label>
-              <Select value={computedStyles.overflowY || "visible"} onValueChange={(v) => updateStyle("overflowY", v)}>
+              <Select
+                value={computedStyles.overflowY || "visible"}
+                onValueChange={(v) => updateStyle("overflowY", v)}
+              >
                 <SelectTrigger id="overflow-y" className="text-xs h-9">
                   <SelectValue placeholder="Y Axis" />
                 </SelectTrigger>
@@ -2399,13 +2866,16 @@ function AppearanceControls({ selectedElement, updateStyle }: any) {
         />
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function StylesTab() {
-  const { state, dispatch } = useEditor()
+  const { state, dispatch } = useEditor();
 
-  const selectedElement = findElementById(state.elements, state.selectedElement)
+  const selectedElement = findElementById(
+    state.elements,
+    state.selectedElement
+  );
 
   if (!state.selectedElement || !selectedElement) {
     return (
@@ -2415,13 +2885,18 @@ export function StylesTab() {
             <Palette className="w-8 h-8 text-gray-400" />
           </div>
           <p className="text-sm text-gray-500 mb-2">No element selected</p>
-          <p className="text-xs text-gray-400">Click on an element to start styling</p>
+          <p className="text-xs text-gray-400">
+            Click on an element to start styling
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
-  const updateStyle = (property: string, value: string | number | undefined) => {
+  const updateStyle = (
+    property: string,
+    value: string | number | undefined
+  ) => {
     dispatch({
       type: "UPDATE_ELEMENT_STYLES",
       payload: {
@@ -2431,8 +2906,8 @@ export function StylesTab() {
           [property]: value,
         },
       },
-    })
-  }
+    });
+  };
 
   const updateContent = (content: string) => {
     dispatch({
@@ -2441,8 +2916,8 @@ export function StylesTab() {
         id: state.selectedElement!,
         updates: { content },
       },
-    })
-  }
+    });
+  };
 
   const updateAttribute = (key: string, value: any) => {
     dispatch({
@@ -2456,43 +2931,59 @@ export function StylesTab() {
           },
         },
       },
-    })
-  }
+    });
+  };
 
-  const canHaveLayout = LAYOUT_ELEMENTS.includes(selectedElement.tag)
-  const computedStyles = getComputedStyles(selectedElement, state.currentBreakpoint)
+  const canHaveLayout = LAYOUT_ELEMENTS.includes(selectedElement.tag);
+  const computedStyles = getComputedStyles(
+    selectedElement,
+    state.currentBreakpoint
+  );
   const hasSpecificStyles =
-    state.currentBreakpoint !== "desktop" && hasBreakpointStyles(selectedElement, state.currentBreakpoint)
-  const isCustomHtml = selectedElement.type === "custom-html"
-  const isImage = selectedElement.tag === "img"
-  const isVideo = selectedElement.tag === "video"
+    state.currentBreakpoint !== "desktop" &&
+    hasBreakpointStyles(selectedElement, state.currentBreakpoint);
+  const isCustomHtml = selectedElement.type === "custom-html";
+  const isImage = selectedElement.tag === "img";
+  const isVideo = selectedElement.tag === "video";
 
   return (
     <div className="p-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-2">
         <div>
-          <h3 className="text-sm font-semibold text-gray-900">{selectedElement.tag}</h3>
-          <p className="text-xs text-gray-500">#{selectedElement.id.slice(0, 8)}</p>
+          <p className="text-xs text-[#4F5C68] ">Selected</p>
         </div>
+
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-xs">
+          <div className="bg-[#F4F6F8] py-1 px-2 rounded-md text-xs text-[#000000]">
             {selectedElement.type}
-          </Badge>
+          </div>
+
           {hasSpecificStyles && (
-            <Badge variant="secondary" className="text-xs">
+            <div className="bg-[#F4F6F8] py-1 px-2 rounded-md text-xs text-[#000000]">
               Custom {state.currentBreakpoint}
-            </Badge>
+            </div>
           )}
-          <Badge
-            variant={state.currentBreakpoint === "desktop" ? "default" : "secondary"}
-            className="text-xs flex items-center gap-1"
-          >
-            {state.currentBreakpoint === "desktop" && <Monitor className="w-3 h-3" />}
-            {state.currentBreakpoint === "tablet" && <Tablet className="w-3 h-3" />}
-            {state.currentBreakpoint === "mobile" && <Smartphone className="w-3 h-3" />}
+
+          <div className="bg-[#F4F6F8] py-1 px-2 rounded-md text-xs text-[#000000] flex items-center gap-1">
+            {state.currentBreakpoint === "desktop" && (
+              <Monitor className="w-3 h-3" />
+            )}
+            {state.currentBreakpoint === "tablet" && (
+              <Tablet className="w-3 h-3" />
+            )}
+            {state.currentBreakpoint === "mobile" && (
+              <Smartphone className="w-3 h-3" />
+            )}
             {state.currentBreakpoint}
-          </Badge>
+          </div>
         </div>
+      </div>
+
+      <div className="bg-[#F4F6F8] py-1.5 mb-6 px-2 items-center flex gap-2 text-xs rounded-md text-[#000000]">
+        <Layers size={12} />
+        <h3>
+          {selectedElement.tag} #{selectedElement.id.slice(0, 8)}
+        </h3>
       </div>
 
       <ScrollArea className="h-[calc(100vh-200px)]">
@@ -2502,7 +2993,10 @@ export function StylesTab() {
           {" "}
           {/* Added pb-4 for scroll spacing */}
           {/* Add Attributes Control at the top */}
-          <AttributesControl selectedElement={selectedElement} updateAttribute={updateAttribute} />
+          <AttributesControl
+            selectedElement={selectedElement}
+            updateAttribute={updateAttribute}
+          />
           {isImage && (
             <ImageControl
               selectedElement={selectedElement}
@@ -2510,8 +3004,18 @@ export function StylesTab() {
               updateStyle={updateStyle}
             />
           )}
-          {isVideo && <VideoControl selectedElement={selectedElement} updateAttribute={updateAttribute} />}
-          {isCustomHtml && <CustomHtmlEditor selectedElement={selectedElement} updateContent={updateContent} />}
+          {isVideo && (
+            <VideoControl
+              selectedElement={selectedElement}
+              updateAttribute={updateAttribute}
+            />
+          )}
+          {isCustomHtml && (
+            <CustomHtmlEditor
+              selectedElement={selectedElement}
+              updateContent={updateContent}
+            />
+          )}
           {canHaveLayout && <LayoutBuilder />}
           {!isCustomHtml && !isImage && !isVideo && (
             <TypographyControls
@@ -2520,8 +3024,14 @@ export function StylesTab() {
               updateContent={updateContent}
             />
           )}
-          <SpacingControls selectedElement={selectedElement} updateStyle={updateStyle} />
-          <AppearanceControls selectedElement={selectedElement} updateStyle={updateStyle} />
+          <SpacingControls
+            selectedElement={selectedElement}
+            updateStyle={updateStyle}
+          />
+          <AppearanceControls
+            selectedElement={selectedElement}
+            updateStyle={updateStyle}
+          />
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center justify-between">
@@ -2530,8 +3040,10 @@ export function StylesTab() {
                   {hasSpecificStyles &&
                     (selectedElement.styles[state.currentBreakpoint]?.width ||
                       selectedElement.styles[state.currentBreakpoint]?.height ||
-                      selectedElement.styles[state.currentBreakpoint]?.minWidth ||
-                      selectedElement.styles[state.currentBreakpoint]?.maxWidth) && (
+                      selectedElement.styles[state.currentBreakpoint]
+                        ?.minWidth ||
+                      selectedElement.styles[state.currentBreakpoint]
+                        ?.maxWidth) && (
                       <Badge variant="secondary" className="text-xs">
                         Custom
                       </Badge>
@@ -2588,5 +3100,5 @@ export function StylesTab() {
         </div>
       </ScrollArea>
     </div>
-  )
+  );
 }

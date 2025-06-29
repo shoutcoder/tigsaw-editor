@@ -574,8 +574,17 @@ export function RenderElement({
     )
       return null;
 
+    // Check if this is a root element (no parent)
+    const isRootElement = !parentId;
+
     return (
-      <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-blue-500 rounded-lg shadow-lg z-50 flex items-center">
+      <div
+        className={cn(
+          "absolute left-1/2 transform -translate-x-1/2 bg-blue-500 rounded-lg shadow-lg z-50 flex items-center",
+          // Conditionally apply positioning based on whether it's a root element
+          isRootElement ? "-top-7 translate-y-full" : "-top-12"
+        )}
+      >
         <Button
           variant="ghost"
           size="sm"
