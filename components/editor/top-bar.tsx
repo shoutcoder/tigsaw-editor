@@ -2,42 +2,31 @@
 
 import { Button } from "@/components/ui/button";
 import { useEditor } from "@/contexts/editor-context";
-import {
-  Monitor,
-  Tablet,
-  Smartphone,
-  Eye,
-  Download,
-  Save,
-  Undo,
-  Redo,
-  Edit3,
-  MousePointer,
-  Settings,
-  ChevronDown,
-  LayoutGrid,
-  ArrowLeft,
-  TriangleAlert,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { exportDesign } from "@/lib/export";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
+import { exportDesign } from "@/lib/export";
+import { cn } from "@/lib/utils";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { SettingsModal } from "../ui/settingModal";
+  ArrowLeft,
+  Download,
+  Edit3,
+  Eye,
+  Monitor,
+  MousePointer,
+  Redo,
+  Save,
+  Settings,
+  Smartphone,
+  Tablet,
+  TriangleAlert,
+  Undo
+} from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface TopBarProps {
   setIsModalOpen: (open: boolean) => void;
   isModalOpen: boolean;
 }
-import { useSearchParams } from "next/navigation";
 
 export function TopBar({ setIsModalOpen, isModalOpen }: TopBarProps) {
   // export function TopBar() {
