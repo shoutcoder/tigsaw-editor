@@ -1,8 +1,8 @@
 "use client";
 
+import { useSearchParams } from 'next/navigation';
 import type React from "react";
-import { createContext, useContext, useReducer, type ReactNode } from "react";
-import { importDesign } from "@/lib/import";
+import { createContext, useContext, useEffect, useReducer, useState, type ReactNode } from "react";
 
 export interface Element {
   id: string;
@@ -89,6 +89,8 @@ export interface EditorState {
 }
 
 type EditorAction =
+ | { type: "INITIALIZE_STATE"; payload: { elements: Element[]; globalJs: string; initialInteractionStates: Record<string, any> } }
+ 
   | {
       type: "ADD_ELEMENT";
       payload: { element: Element; parentId?: string; index?: number };
@@ -147,22 +149,26 @@ type EditorAction =
   | { type: "SELECT_ASSET_FOR_STYLE"; payload: { asset: Asset | null } };
 
 // Initialize with default hero banner
-const defaultContent = importDesign("", "", "");
+// const defaultContent = importDesign("", "", "");
 
 const initialState: EditorState = {
-  elements: defaultContent.elements,
+  // elements: defaultContent.elements,
+  elements: [],
   selectedElement: null,
   currentBreakpoint: "desktop",
   isPreviewMode: false,
   editingMode: "editing",
-  history: [defaultContent.elements],
+  // history: [defaultContent.elements],
+  history: [[]],
   historyIndex: 0,
   activeTab: "elements",
-  interactionStates: defaultContent.initialInteractionStates || {}, // Use initial states if provided
+  // interactionStates: defaultContent.initialInteractionStates || {}, // Use initial states if provided
+   interactionStates:{}, 
   draggedElement: null,
   assets: [],
   selectedAssetForStyle: null,
-  globalJs: defaultContent.globalJs,
+  // globalJs: defaultContent.globalJs,
+  globalJs: "",
 };
 
 function findElementById(
@@ -373,6 +379,17 @@ function addToHistory(state: EditorState): EditorState {
 
 function editorReducer(state: EditorState, action: EditorAction): EditorState {
   switch (action.type) {
+     case "INITIALIZE_STATE": {
+      const { elements, globalJs, initialInteractionStates } = action.payload
+      return {
+        ...state,
+        elements,
+        globalJs,
+        interactionStates: initialInteractionStates,
+        history: [elements],
+        historyIndex: 0,
+      }
+    }
     case "ADD_ELEMENT": {
       console.log("🚀 ADD_ELEMENT dispatched:", action.payload);
       const newState = addToHistory(state);
@@ -713,7 +730,57 @@ const EditorContext = createContext<{
 
 export function EditorProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(editorReducer, initialState);
+    const searchParams = useSearchParams();
+  const templateId = searchParams.get('templateId') || ''; // Default to a specific template ID if not provided
+  const [isInitialized, setIsInitialized] = useState(false)
 
+useEffect(() => {
+    const initializeEditor = async () => {
+      try {
+        // Your direct API call approach
+        const res = await fetch(`http://localhost:3000/api/templates/${templateId}`)
+        const data = await res.json()
+        console.log("Data api", data)
+        const elements: Element[] = Array.isArray(data.editableCode) ? data.editableCode : []
+        const globalJs: string = typeof data.js === 'string' ? data.js : ""
+        
+        // const {editableCode:Element[]} = data
+        dispatch({
+          type: "INITIALIZE_STATE",
+          payload: {
+            elements,
+            globalJs,
+            initialInteractionStates: {},
+          },
+        })
+        
+        setIsInitialized(true)
+        if(data.js && data.js.trim() !== "") {
+          const executeJs = new Function(data.js)
+          executeJs()
+        }
+      } catch (error) {
+        console.error("Failed to initialize editor:", error)
+        setIsInitialized(true) // Still mark as initialized to show the empty state
+      }
+    }
+
+    initializeEditor()
+  }, [])
+  if (!isInitialized) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '18px',
+        color: '#666'
+      }}>
+        Loading editor...
+      </div>
+    )
+  }
   return (
     <EditorContext.Provider value={{ state, dispatch }}>
       {children}
@@ -730,3 +797,4 @@ export function useEditor() {
 }
 
 export { findElementById };
+

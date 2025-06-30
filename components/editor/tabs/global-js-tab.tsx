@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Code, Play, RotateCcw } from "lucide-react";
-import { useState } from "react";
+import { useState} from "react";
 
 export function GlobalJsTab() {
   const { state, dispatch } = useEditor();
@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
               </div>
 
               <div className="text-xs text-gray-500 space-y-1">
+                 <p>• <i className="text-red-500">Click <span>"Save & Apply"</span> to save your changes to the database </i> </p>
                 <p>
                   • This JavaScript will be executed in the editor environment
                 </p>

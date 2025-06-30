@@ -21,7 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { exportDesign } from "@/lib/export";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,10 +30,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useSearchParams } from "next/navigation"
+
 
 export function TopBar() {
+  const searchParams = useSearchParams();
+  const templateId = searchParams.get('templateId') || ''; // Default to a specific template ID if not provided
   const { state, dispatch } = useEditor();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Add keyboard shortcuts (copied from old Toolbar)
   useEffect(() => {
@@ -91,24 +96,70 @@ export function TopBar() {
     { key: "mobile" as const, icon: Smartphone, label: "Mobile" },
   ];
 
-  const handleExport = () => {
-    const files = exportDesign(state.elements, state.globalJs); // Pass globalJs here
-    files.forEach((file) => {
-      const blob = new Blob([file.content], { type: "text/plain" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = file.name;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
-    toast({
-      title: "Export Complete",
-      description:
-        "Your website files have been downloaded with global JS included.",
-    });
+  const handleExport = async () => {
+    setIsLoading(true);
+    try {
+      const files = exportDesign(state.elements, state.globalJs);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(files[0].content, "text/html");
+      const body = doc.querySelector("body");
+      body?.querySelector("script")?.remove();
+      console.log("BODY", body);
+
+      const css = files[1].content;
+      const htmlString = body 
+        ? body.outerHTML
+        : "";
+
+      console.log("Html", htmlString);
+      const res = await fetch('http://localhost:3000/api/templates/updateEditableCode', {
+        method: "POST",
+        headers: {
+      'Content-Type': 'application/json',
+    },
+        body: JSON.stringify({
+          id: templateId,
+          editableCode: state.elements || [],
+          js: state.globalJs || "",
+          html:htmlString,
+          css,
+        })
+      })
+      if (!res.ok) {
+        toast({
+          title: "Export Failed",
+          description: "There was an error exporting your design.",
+          variant: "destructive",
+        });
+        return;
+      }
+      toast({
+        title: "Export Successful",
+        description: "Your design has been saved successfully.",
+      });
+      // const files = exportDesign(state.elements, state.globalJs); // Pass globalJs here
+      // files.forEach((file) => {
+      //   const blob = new Blob([file.content], { type: "text/plain" });
+      //   const url = URL.createObjectURL(blob);
+      //   const a = document.createElement("a");
+      //   a.href = url;
+      //   a.download = file.name;
+      //   document.body.appendChild(a);
+      //   a.click();
+      //   document.body.removeChild(a);
+      //   URL.revokeObjectURL(url);
+      // });
+    }
+    catch (err) {
+      toast({
+          title: "Export Failed",
+          description: "There was an error exporting your design.",
+          variant: "destructive",
+        });
+    }
+    finally {
+      setIsLoading(false);
+    }
   };
 
   const canUndo = state.historyIndex > 0;
@@ -290,14 +341,25 @@ export function TopBar() {
           >
             <Settings className="w-5 h-5" />
           </Button>
+          
           <Button
             variant="outline"
             size="sm"
             className="h-7 px-2 text-xs"
             onClick={handleExport}
+            disabled={isLoading}
           >
-            <Download className="w-3.5 h-3.5 mr-1" />
-            Publish
+            {isLoading ? (
+              <>
+                <div className="w-3.5 h-3.5 mr-1 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+                Publishing...
+              </>
+            ) : (
+              <>
+                <Download className="w-3.5 h-3.5 mr-1" />
+                Publish
+              </>
+            )}
           </Button>
         </div>
       </div>
