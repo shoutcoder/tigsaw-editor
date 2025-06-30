@@ -122,6 +122,13 @@ export function EditorLayout() {
 
           {/* Resize handle */}
           {/* ... right panel ... */}
+          {/* Resize handle for right panel */}
+          {!state.isPreviewMode && (
+            <div
+              className="w-3 cursor-col-resize flex-shrink-0"
+              onMouseDown={handleRightResize}
+            />
+          )}
 
           {!state.isPreviewMode && (
             <div
