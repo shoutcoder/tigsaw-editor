@@ -17,11 +17,12 @@ import {
   ChevronDown,
   LayoutGrid,
   ArrowLeft,
+  TriangleAlert,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { exportDesign } from "@/lib/export";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,10 +31,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SettingsModal } from "../ui/settingModal";
 
-export function TopBar() {
+interface TopBarProps {
+  setIsModalOpen: (open: boolean) => void;
+  isModalOpen: boolean;
+}
+
+export function TopBar({ setIsModalOpen, isModalOpen }: TopBarProps) {
   const { state, dispatch } = useEditor();
   const { toast } = useToast();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [settingsConfigured, setSettingsConfigured] = useState(false);
 
   // Add keyboard shortcuts (copied from old Toolbar)
   useEffect(() => {
@@ -282,21 +291,26 @@ export function TopBar() {
           </Button>
         </div>
         {/* Right Section - View & Export */}
-        <div className="flex items-center space-x-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-8 h-8 text-gray-600 hover:text-gray-900"
-          >
-            <Settings className="w-5 h-5" />
-          </Button>
+        <div className="flex items-center space-x-1 gap-2">
+          <div className="relative inline-block">
+            <button
+              onClick={() => setIsModalOpen(!isModalOpen)}
+              className="p-2 border border-gray-300 rounded-lg flex items-center justify-center bg-white hover:border-gray-400"
+            >
+              <Settings className="w-4 h-4 text-gray-700" />
+            </button>
+
+            {!settingsConfigured && (
+              <TriangleAlert className="absolute -top-1.5 -right-1.5 w-4 h-4 text-orange-500 bg-white rounded-full" />
+            )}
+          </div>
           <Button
             variant="outline"
-            size="sm"
-            className="h-7 px-2 text-xs"
+            size="lg"
+            className="h-7 px-6 text-xs"
             onClick={handleExport}
+            disabled={!settingsConfigured}
           >
-            <Download className="w-3.5 h-3.5 mr-1" />
             Publish
           </Button>
         </div>

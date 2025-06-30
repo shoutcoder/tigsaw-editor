@@ -59,6 +59,8 @@ import {
   MinusCircle,
   Settings,
   Layers,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
@@ -69,6 +71,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"; // For inset/outset shadow
+import { ActionControls } from "./actionControll";
 
 // Define which elements can have layout controls
 const LAYOUT_ELEMENTS = [
@@ -164,14 +167,14 @@ function ColorPicker({
   popoverSide = "bottom",
   popoverAlign = "center",
 }: ColorPickerProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const displayValue = value || (isInherited ? "Inherited" : "#000000");
 
   return (
     <div className={className}>
       {label && (
         <div className="flex items-center justify-between mb-1">
-          <Label className="text-xs text-gray-600">{label}</Label>
+          <Label className="text-[10px] text-gray-600">{label}</Label>
           {isInherited && onReset && (
             <Button
               variant="ghost"
@@ -190,7 +193,7 @@ function ColorPicker({
           <Button
             variant="outline"
             className={cn(
-              "w-full h-9 justify-start text-left font-normal text-xs",
+              "w-full h-9 justify-start text-left font-normal text-[10px]",
               isInherited && "border-blue-300 border-dashed"
             )}
           >
@@ -226,7 +229,7 @@ function ColorPicker({
               value={value}
               onChange={(e) => onChange(e.target.value)}
               className={cn(
-                "w-full text-xs h-8 mb-2",
+                "w-full text-[10px] h-8 mb-2",
                 isInherited && "border-blue-300 border-dashed"
               )}
               placeholder="#000000 or transparent"
@@ -250,7 +253,7 @@ function ColorPicker({
               ))}
             </div>
             {isInherited && (
-              <p className="text-xs text-blue-600 mt-1">
+              <p className="text-[10px] text-blue-600 mt-1">
                 Inherited from desktop
               </p>
             )}
@@ -262,6 +265,12 @@ function ColorPicker({
 }
 
 function AttributesControl({ selectedElement, updateAttribute }: any) {
+  const [isOpen, setIsOpen] = useState(true); // Initial state (open or collapsed)
+
+  const toggleOpen = () => {
+    setIsOpen(!isOpen);
+  };
+
   const commonAttributes = [
     { key: "id", label: "ID", placeholder: "unique-element-id" },
     { key: "class", label: "CSS Class", placeholder: "my-custom-class" },
@@ -269,7 +278,6 @@ function AttributesControl({ selectedElement, updateAttribute }: any) {
     { key: "data-testid", label: "Test ID", placeholder: "test-element" },
   ];
 
-  // Get element-specific attributes
   const getElementSpecificAttributes = () => {
     switch (selectedElement.tag) {
       case "a":
@@ -317,41 +325,50 @@ function AttributesControl({ selectedElement, updateAttribute }: any) {
   const allAttributes = [...commonAttributes, ...elementSpecificAttributes];
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm flex items-center gap-2">
-          <Settings className="w-4 h-4" />
-          HTML Attributes
+    <div className=" py-2">
+      <CardHeader className="p-0 cursor-pointer" onClick={toggleOpen}>
+        <CardTitle className="text-[11px] font-normal flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">HTML Attributes</div>
+          {isOpen ? (
+            <ChevronDown className="w-4 h-4 text-gray-500" />
+          ) : (
+            <ChevronRight className="w-4 h-4 text-gray-500" />
+          )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {allAttributes.map((attr) => (
-          <div key={attr.key}>
-            <Label className="text-xs text-gray-600">{attr.label}</Label>
-            <Input
-              value={selectedElement.attributes?.[attr.key] || ""}
-              onChange={(e) => updateAttribute(attr.key, e.target.value)}
-              placeholder={attr.placeholder}
-              className="mt-1 text-xs"
-            />
-          </div>
-        ))}
 
-        <div className="pt-2 border-t border-gray-200">
-          <p className="text-xs text-gray-500 mb-2">
-            💡 Tip: Add an ID to target elements with JavaScript
-          </p>
-          <div className="bg-gray-50 p-2 rounded text-xs font-mono">
-            document.getElementById('your-id')
+      {isOpen && (
+        <div className="space-y-3 pt-4">
+          {allAttributes.map((attr) => (
+            <div key={attr.key}>
+              <Label className="text-[10px] text-gray-600">{attr.label}</Label>
+              <Input
+                value={selectedElement.attributes?.[attr.key] || ""}
+                onChange={(e) => updateAttribute(attr.key, e.target.value)}
+                placeholder={attr.placeholder}
+                className="mt-1 text-[10px]"
+              />
+            </div>
+          ))}
+
+          <div className="pt-2 border-t border-gray-200">
+            <p className="text-[10px] text-gray-500 mb-2">
+              💡 Tip: Add an ID to target elements with JavaScript
+            </p>
+            <div className="bg-gray-50 p-2 rounded text-[10px] font-mono">
+              document.getElementById('your-id')
+            </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }
 
 function LayoutBuilder() {
   const { state, dispatch } = useEditor();
+  const [isOpen, setIsOpen] = useState(true);
+  const toggleOpen = () => setIsOpen((prev) => !prev);
 
   const currentElement = findElementById(state.elements, state.selectedElement);
   if (!currentElement) return null;
@@ -465,293 +482,299 @@ function LayoutBuilder() {
     !currentElement.styles[state.currentBreakpoint]?.gap;
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm flex items-center justify-between">
-          <span className="flex items-center gap-2">
+    <div className="py-2">
+      <CardHeader className="p-0 cursor-pointer" onClick={toggleOpen}>
+        <CardTitle className="text-xs font-normal flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <Layout className="w-4 h-4" />
             Layout
-          </span>
+          </div>
           <div className="flex items-center gap-2">
             {hasSpecificStyles && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-[10px]">
                 Custom
               </Badge>
             )}
-            <Badge variant="outline" className="text-xs">
+            {/* <Badge variant="outline" className="text-[10px]">
               {state.currentBreakpoint}
-            </Badge>
+            </Badge> */}
+            {isOpen ? (
+              <ChevronDown className="w-[14px] h-[14px] text-gray-500" />
+            ) : (
+              <ChevronRight className="w-[14px] h-[14px] text-gray-500" />
+            )}
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium text-gray-700">Type</Label>
-            {isDisplayInherited && (
+
+      {isOpen && (
+        <div className="space-y-4 pt-4">
+          {/* Layout Type */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-medium text-gray-700">Type</Label>
+              {isDisplayInherited && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 text-gray-400 "
+                  onClick={() => resetStyleToDesktop("display")}
+                  title="Reset to inherit from desktop"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                </Button>
+              )}
+            </div>
+            <div className="flex gap-0 bg-gray-100 rounded-lg p-1">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
-                onClick={() => resetStyleToDesktop("display")}
-                title="Reset to inherit from desktop"
-              >
-                <RotateCcw className="w-3 h-3" />
-              </Button>
-            )}
-          </div>
-          <div className="flex gap-0 bg-gray-100 rounded-lg p-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "flex-1 h-9 rounded-md transition-all",
-                isStack
-                  ? "bg-blue-500 text-white shadow-sm hover:bg-blue-600"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50",
-                isDisplayInherited && "border-blue-300 border-dashed"
-              )}
-              onClick={() => setLayoutType("stack")}
-            >
-              Stack
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "flex-1 h-9 rounded-md transition-all",
-                isGrid
-                  ? "bg-blue-500 text-white shadow-sm hover:bg-blue-600"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50",
-                isDisplayInherited && "border-blue-300 border-dashed"
-              )}
-              onClick={() => setLayoutType("grid")}
-            >
-              Grid
-            </Button>
-          </div>
-          {isDisplayInherited && (
-            <p className="text-xs text-blue-600">Inherited from desktop</p>
-          )}
-        </div>
-
-        {(isStack || isGrid) && (
-          <>
-            {isStack && (
-              <>
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
-                    Direction
-                  </Label>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={cn(
-                        "flex-1 h-10 transition-all",
-                        computedStyles.flexDirection === "row"
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300"
-                      )}
-                      onClick={() => updateStyle("flexDirection", "row")}
-                    >
-                      <ArrowLeftRight className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={cn(
-                        "flex-1 h-10 transition-all",
-                        computedStyles.flexDirection === "column" ||
-                          !computedStyles.flexDirection
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300"
-                      )}
-                      onClick={() => updateStyle("flexDirection", "column")}
-                    >
-                      <ArrowUpDown className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
-                    Distribute
-                  </Label>
-                  <Select
-                    value={computedStyles.justifyContent || "flex-start"}
-                    onValueChange={(value) =>
-                      updateStyle("justifyContent", value)
-                    }
-                  >
-                    <SelectTrigger className="h-10 border-gray-200">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="flex-start">Start</SelectItem>
-                      <SelectItem value="center">Center</SelectItem>
-                      <SelectItem value="flex-end">End</SelectItem>
-                      <SelectItem value="space-between">
-                        Space Between
-                      </SelectItem>
-                      <SelectItem value="space-around">Space Around</SelectItem>
-                      <SelectItem value="space-evenly">Space Evenly</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
-                    Align
-                  </Label>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={cn(
-                        "flex-1 h-10 transition-all",
-                        computedStyles.alignItems === "flex-start"
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300"
-                      )}
-                      onClick={() => updateStyle("alignItems", "flex-start")}
-                    >
-                      {computedStyles.flexDirection === "row" ? (
-                        <AlignStartVertical className="w-4 h-4" />
-                      ) : (
-                        <AlignStartHorizontal className="w-4 h-4" />
-                      )}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={cn(
-                        "flex-1 h-10 transition-all",
-                        computedStyles.alignItems === "center"
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300"
-                      )}
-                      onClick={() => updateStyle("alignItems", "center")}
-                    >
-                      {computedStyles.flexDirection === "row" ? (
-                        <AlignCenterVertical className="w-4 h-4" />
-                      ) : (
-                        <AlignCenterHorizontal className="w-4 h-4" />
-                      )}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={cn(
-                        "flex-1 h-10 transition-all",
-                        computedStyles.alignItems === "flex-end"
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300"
-                      )}
-                      onClick={() => updateStyle("alignItems", "flex-end")}
-                    >
-                      {computedStyles.flexDirection === "row" ? (
-                        <AlignEndVertical className="w-4 h-4" />
-                      ) : (
-                        <AlignEndHorizontal className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </>
-            )}
-            {isGrid && (
-              <>
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
-                    Columns
-                  </Label>
-                  <div className="grid grid-cols-2 gap-1 mb-2">
-                    {[
-                      { label: "1", value: "1fr" },
-                      { label: "2", value: "1fr 1fr" },
-                      { label: "3", value: "1fr 1fr 1fr" },
-                      { label: "4", value: "1fr 1fr 1fr 1fr" },
-                    ].map((option) => (
-                      <Button
-                        key={option.value}
-                        variant="outline"
-                        size="sm"
-                        className={cn(
-                          "h-10 text-sm transition-all",
-                          computedStyles.gridTemplateColumns === option.value
-                            ? "border-blue-500 bg-blue-50 text-blue-700"
-                            : "border-gray-200 hover:border-gray-300"
-                        )}
-                        onClick={() =>
-                          updateStyle("gridTemplateColumns", option.value)
-                        }
-                      >
-                        {option.label} Col
-                      </Button>
-                    ))}
-                  </div>
-                  <Input
-                    value={computedStyles.gridTemplateColumns || "1fr 1fr"}
-                    onChange={(e) =>
-                      updateStyle("gridTemplateColumns", e.target.value)
-                    }
-                    placeholder="1fr 1fr"
-                    className="h-10 border-gray-200"
-                  />
-                </div>
-              </>
-            )}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium text-gray-700">Gap</Label>
-                {isGapInherited && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
-                    onClick={() => resetStyleToDesktop("gap")}
-                    title="Reset Gap to inherit"
-                  >
-                    <RotateCcw className="w-3 h-3" />
-                  </Button>
+                className={cn(
+                  "flex-1 h-9 rounded-md transition-all",
+                  isStack
+                    ? "bg-[#FE784E] text-white shadow-sm hover:bg-[#FE784E]"
+                    : "text-gray-600  ",
+                  isDisplayInherited && "border-blue-300 border-dashed"
                 )}
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-20">
-                  <Input
-                    value={getGapValue()}
-                    onChange={(e) =>
-                      setGap(Number.parseFloat(e.target.value) || 0)
-                    }
+                onClick={() => setLayoutType("stack")}
+              >
+                Stack
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "flex-1 h-9 rounded-md transition-all",
+                  isGrid
+                    ? "bg-[#FE784E] text-white shadow-sm hover:bg-[#FE784E]"
+                    : "text-gray-600  ",
+                  isDisplayInherited && "border-blue-300 border-dashed"
+                )}
+                onClick={() => setLayoutType("grid")}
+              >
+                Grid
+              </Button>
+            </div>
+            {isDisplayInherited && (
+              <p className="text-[10px] text-blue-600">
+                Inherited from desktop
+              </p>
+            )}
+          </div>
+
+          {/* Stack Layout Controls */}
+          {isStack && (
+            <>
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-gray-700">
+                  Direction
+                </Label>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className={cn(
-                      "h-10 text-center border-gray-200",
-                      isGapInherited && "border-blue-300 border-dashed"
+                      "flex-1 h-10",
+                      computedStyles.flexDirection === "row"
+                        ? "border-[#FE784E] bg-orange-50 text-[#FE784E]"
+                        : "border-gray-200 hover:border-gray-300"
                     )}
-                    type="number"
-                    min="0"
-                    step="0.5"
-                  />
-                </div>
-                <div className="flex-1">
-                  <Slider
-                    value={[getGapValue()]}
-                    onValueChange={([value]) => setGap(value)}
-                    max={100}
-                    min={0}
-                    step={0.5}
-                    className="w-full"
-                  />
+                    onClick={() => updateStyle("flexDirection", "row")}
+                  >
+                    <ArrowLeftRight className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "flex-1 h-10",
+                      !computedStyles.flexDirection ||
+                        computedStyles.flexDirection === "column"
+                        ? "border-[#FE784E] bg-orange-50 text-[#FE784E]"
+                        : "border-gray-200 hover:border-gray-300"
+                    )}
+                    onClick={() => updateStyle("flexDirection", "column")}
+                  >
+                    <ArrowUpDown className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-gray-700">
+                  Distribute
+                </Label>
+                <Select
+                  value={computedStyles.justifyContent || "flex-start"}
+                  onValueChange={(value) =>
+                    updateStyle("justifyContent", value)
+                  }
+                >
+                  <SelectTrigger className="h-10 border-gray-200 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="flex-start">Start</SelectItem>
+                    <SelectItem value="center">Center</SelectItem>
+                    <SelectItem value="flex-end">End</SelectItem>
+                    <SelectItem value="space-between">Space Between</SelectItem>
+                    <SelectItem value="space-around">Space Around</SelectItem>
+                    <SelectItem value="space-evenly">Space Evenly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-gray-700">
+                  Align
+                </Label>
+                <div className="flex gap-2">
+                  {/* Align Start */}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className={cn(
+                      "flex-1 h-10",
+                      computedStyles.alignItems === "flex-start"
+                        ? "border-[#FE784E] bg-orange-50 text-[#FE784E]"
+                        : "border-gray-200 hover:border-gray-300"
+                    )}
+                    onClick={() => updateStyle("alignItems", "flex-start")}
+                  >
+                    {computedStyles.flexDirection === "row" ? (
+                      <AlignStartVertical className="w-4 h-4" />
+                    ) : (
+                      <AlignStartHorizontal className="w-4 h-4" />
+                    )}
+                  </Button>
+                  {/* Align Center */}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className={cn(
+                      "flex-1 h-10",
+                      computedStyles.alignItems === "center"
+                        ? "border-[#FE784E] bg-orange-50 text-[#FE784E]"
+                        : "border-gray-200 hover:border-gray-300"
+                    )}
+                    onClick={() => updateStyle("alignItems", "center")}
+                  >
+                    {computedStyles.flexDirection === "row" ? (
+                      <AlignCenterVertical className="w-4 h-4" />
+                    ) : (
+                      <AlignCenterHorizontal className="w-4 h-4" />
+                    )}
+                  </Button>
+                  {/* Align End */}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className={cn(
+                      "flex-1 h-10",
+                      computedStyles.alignItems === "flex-end"
+                        ? "border-[#FE784E] bg-orange-50 text-[#FE784E]"
+                        : "border-gray-200 hover:border-gray-300"
+                    )}
+                    onClick={() => updateStyle("alignItems", "flex-end")}
+                  >
+                    {computedStyles.flexDirection === "row" ? (
+                      <AlignEndVertical className="w-4 h-4" />
+                    ) : (
+                      <AlignEndHorizontal className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Grid Controls */}
+          {isGrid && (
+            <div className="space-y-2">
+              <Label className="text-xs font-medium text-gray-700">
+                Columns
+              </Label>
+              <div className="grid grid-cols-2 gap-1 mb-2">
+                {[
+                  { label: "1", value: "1fr" },
+                  { label: "2", value: "1fr 1fr" },
+                  { label: "3", value: "1fr 1fr 1fr" },
+                  { label: "4", value: "1fr 1fr 1fr 1fr" },
+                ].map((opt) => (
+                  <Button
+                    key={opt.value}
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "h-10 text-xs",
+                      computedStyles.gridTemplateColumns === opt.value
+                        ? "border-[#FE784E] bg-orange-50 text-[#FE784E]"
+                        : "border-gray-200 hover:border-gray-300"
+                    )}
+                    onClick={() =>
+                      updateStyle("gridTemplateColumns", opt.value)
+                    }
+                  >
+                    {opt.label} Col
+                  </Button>
+                ))}
+              </div>
+              <Input
+                value={computedStyles.gridTemplateColumns || ""}
+                onChange={(e) =>
+                  updateStyle("gridTemplateColumns", e.target.value)
+                }
+                placeholder="1fr 1fr"
+                className="h-10 border-gray-200 text-xs"
+              />
+            </div>
+          )}
+
+          {/* Gap Control */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-medium text-gray-700">Gap</Label>
               {isGapInherited && (
-                <p className="text-xs text-blue-600">Inherited from desktop</p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
+                  onClick={() => resetStyleToDesktop("gap")}
+                  title="Reset Gap"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                </Button>
               )}
             </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
+            <div className="flex items-center gap-3">
+              <Input
+                value={getGapValue()}
+                onChange={(e) => setGap(Number.parseFloat(e.target.value) || 0)}
+                type="number"
+                step="1"
+                className={cn(
+                  "h-10 text-center w-20 text-xs",
+                  isGapInherited && "border-blue-300 border-dashed"
+                )}
+              />
+              <Slider
+                value={[getGapValue()]}
+                onValueChange={([val]) => setGap(val)}
+                min={0}
+                max={100}
+                step={1}
+                className="w-full"
+              />
+            </div>
+            {isGapInherited && (
+              <p className="text-[10px] text-blue-600">
+                Inherited from desktop
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -769,20 +792,20 @@ function CustomHtmlEditor({ selectedElement, updateContent }: any) {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm flex items-center gap-2">
+        <CardTitle className="text-xs font-normal flex items-center gap-2">
           <Code className="w-4 h-4" /> Custom HTML
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Label className="text-xs text-gray-600">HTML Code</Label>
+        <Label className="text-[10px] text-gray-600">HTML Code</Label>
         <Textarea
           value={htmlContent}
           onChange={(e) => setHtmlContent(e.target.value)}
           onBlur={handleBlur}
           placeholder="<div>Your HTML here</div>"
-          className="mt-1 font-mono text-xs h-48 bg-gray-50"
+          className="mt-1 font-mono text-[10px] h-48 bg-gray-50"
         />
-        <p className="text-xs text-gray-500 mt-2">
+        <p className="text-[10px] text-gray-500 mt-2">
           Note: Scripts may not run in the editor but will be included in the
           export.
         </p>
@@ -804,6 +827,9 @@ function TypographyControls({
   const hasSpecificStyles =
     state.currentBreakpoint !== "desktop" &&
     hasBreakpointStyles(selectedElement, state.currentBreakpoint);
+
+  const [isOpen, setIsOpen] = useState(true);
+  const toggleOpen = () => setIsOpen((prev) => !prev);
 
   const [isCustomFont, setIsCustomFont] = useState(false);
   const [customFontName, setCustomFontName] = useState("");
@@ -859,11 +885,10 @@ function TypographyControls({
   const handleFontFamilyChange = (value: string) => {
     if (value === CUSTOM_FONT_KEY) {
       setIsCustomFont(true);
-      // Don't immediately change font, wait for custom inputs
     } else {
       setIsCustomFont(false);
       updateStyle("fontFamily", value);
-      updateStyle("fontFaceUrl", undefined); // Clear custom URL if a web-safe font is chosen
+      updateStyle("fontFaceUrl", undefined);
     }
   };
 
@@ -888,264 +913,270 @@ function TypographyControls({
     !selectedElement.styles[state.currentBreakpoint]?.fontFaceUrl;
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm flex items-center justify-between">
-          <span className="flex items-center gap-2">
-            <Type className="w-4 h-4" /> Typography
-          </span>
+    <div className="py-2">
+      <CardHeader className="p-0 cursor-pointer" onClick={toggleOpen}>
+        <CardTitle className="text-xs font-normal flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Type className="w-4 h-4" />
+            Typography
+          </div>
           <div className="flex items-center gap-2">
             {hasSpecificStyles && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-[10px]">
                 Custom
               </Badge>
             )}
-            <Badge variant="outline" className="text-xs">
+            {/* <Badge variant="outline" className="text-[10px]">
               {state.currentBreakpoint}
-            </Badge>
+            </Badge> */}
+            {isOpen ? (
+              <ChevronDown className="w-4 h-4 text-gray-500" />
+            ) : (
+              <ChevronRight className="w-4 h-4 text-gray-500" />
+            )}
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {(selectedElement.tag === "p" ||
-          selectedElement.tag.startsWith("h") ||
-          selectedElement.tag === "button") && (
+
+      {isOpen && (
+        <div className="space-y-4 pt-4">
+          {(selectedElement.tag === "p" ||
+            selectedElement.tag.startsWith("h") ||
+            selectedElement.tag === "button") && (
+            <div>
+              <Label className="text-[10px] text-gray-600">Content</Label>
+              <Input
+                value={selectedElement.content || ""}
+                onChange={(e) => updateContent(e.target.value)}
+                className="mt-1 text-[10px]"
+                placeholder="Enter text..."
+              />
+            </div>
+          )}
+
+          {/* Font Family */}
           <div>
-            <Label className="text-xs text-gray-600">Content</Label>
+            <div className="flex items-center justify-between mb-1">
+              <Label className="text-[10px] text-gray-600">Font Family</Label>
+              {isFontFamilyInherited && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
+                  onClick={() =>
+                    resetStyleToDesktop(["fontFamily", "fontFaceUrl"])
+                  }
+                  title="Reset Font Family"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                </Button>
+              )}
+            </div>
+            <Select
+              value={
+                isCustomFont
+                  ? CUSTOM_FONT_KEY
+                  : computedStyles.fontFamily || WEB_SAFE_FONTS[0].value
+              }
+              onValueChange={handleFontFamilyChange}
+            >
+              <SelectTrigger
+                className={cn(
+                  "text-[10px]",
+                  isFontFamilyInherited && "border-blue-300 border-dashed"
+                )}
+              >
+                <SelectValue placeholder="Select font" />
+              </SelectTrigger>
+              <SelectContent>
+                {WEB_SAFE_FONTS.map((font) => (
+                  <SelectItem
+                    key={font.value}
+                    value={font.value}
+                    style={{ fontFamily: font.value }}
+                  >
+                    {font.name}
+                  </SelectItem>
+                ))}
+                <SelectItem value={CUSTOM_FONT_KEY}>Custom...</SelectItem>
+              </SelectContent>
+            </Select>
+            {isFontFamilyInherited && (
+              <p className="text-[10px] text-blue-600 mt-1">
+                Inherited from desktop
+              </p>
+            )}
+          </div>
+
+          {isCustomFont && (
+            <div className="space-y-3 p-3 border border-dashed border-gray-300 rounded-md mt-2">
+              <div>
+                <Label className="text-[10px] text-gray-600">
+                  Custom Font Name
+                </Label>
+                <Input
+                  value={customFontName}
+                  onChange={(e) => setCustomFontName(e.target.value)}
+                  placeholder="e.g., MyCustomFont"
+                  className={cn(
+                    "text-[10px] mt-1",
+                    isFontFamilyInherited && "border-blue-300 border-dashed"
+                  )}
+                  onBlur={applyCustomFont}
+                />
+              </div>
+              <div>
+                <Label className="text-[10px] text-gray-600">
+                  Font File URL (.woff2, .woff, .ttf)
+                </Label>
+                <Input
+                  value={customFontUrl}
+                  onChange={(e) => setCustomFontUrl(e.target.value)}
+                  placeholder="https://example.com/font.woff2"
+                  className={cn(
+                    "text-[10px] mt-1",
+                    isFontUrlInherited && "border-blue-300 border-dashed"
+                  )}
+                  onBlur={applyCustomFont}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Font Size Block */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <Label className="text-[10px] text-gray-600">Font Size</Label>
+              {isFontSizeInherited && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
+                  onClick={() => resetStyleToDesktop("fontSize")}
+                  title="Reset Font Size"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-3 gap-1 mb-2">
+              {FONT_SIZES.map((size) => (
+                <Button
+                  key={size.value}
+                  variant={
+                    computedStyles.fontSize === size.value
+                      ? "default"
+                      : "outline"
+                  }
+                  size="sm"
+                  className={cn(
+                    "h-8 text-[10px]",
+                    isFontSizeInherited && "border-blue-300 border-dashed"
+                  )}
+                  onClick={() => updateStyle("fontSize", size.value)}
+                >
+                  {size.name}
+                </Button>
+              ))}
+            </div>
             <Input
-              value={selectedElement.content || ""}
-              onChange={(e) => updateContent(e.target.value)}
-              className="mt-1"
-              placeholder="Enter text..."
+              value={computedStyles.fontSize || "16px"}
+              onChange={(e) => updateStyle("fontSize", e.target.value)}
+              placeholder="16px"
+              className={cn(
+                "text-[10px]",
+                isFontSizeInherited && "border-blue-300 border-dashed"
+              )}
             />
           </div>
-        )}
 
-        {/* Font Family */}
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <Label className="text-xs text-gray-600">Font Family</Label>
-            {isFontFamilyInherited && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
-                onClick={() =>
-                  resetStyleToDesktop(["fontFamily", "fontFaceUrl"])
-                }
-                title="Reset Font Family"
-              >
-                <RotateCcw className="w-3 h-3" />
-              </Button>
-            )}
-          </div>
-          <Select
-            value={
-              isCustomFont
-                ? CUSTOM_FONT_KEY
-                : computedStyles.fontFamily || WEB_SAFE_FONTS[0].value
-            }
-            onValueChange={handleFontFamilyChange}
-          >
-            <SelectTrigger
-              className={cn(
-                "text-xs",
-                isFontFamilyInherited && "border-blue-300 border-dashed"
-              )}
+          {/* Toggle Buttons */}
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              variant={
+                computedStyles.fontWeight === "bold" ? "default" : "outline"
+              }
+              size="sm"
+              onClick={() =>
+                updateStyle(
+                  "fontWeight",
+                  computedStyles.fontWeight === "bold" ? "normal" : "bold"
+                )
+              }
             >
-              <SelectValue placeholder="Select font" />
-            </SelectTrigger>
-            <SelectContent>
-              {WEB_SAFE_FONTS.map((font) => (
-                <SelectItem
-                  key={font.value}
-                  value={font.value}
-                  style={{ fontFamily: font.value }}
-                >
-                  {font.name}
-                </SelectItem>
-              ))}
-              <SelectItem value={CUSTOM_FONT_KEY}>Custom...</SelectItem>
-            </SelectContent>
-          </Select>
-          {isFontFamilyInherited && (
-            <p className="text-xs text-blue-600 mt-1">Inherited from desktop</p>
-          )}
-        </div>
-
-        {isCustomFont && (
-          <div className="space-y-3 p-3 border border-dashed border-gray-300 rounded-md mt-2">
-            <div>
-              <Label className="text-xs text-gray-600">Custom Font Name</Label>
-              <Input
-                value={customFontName}
-                onChange={(e) => setCustomFontName(e.target.value)}
-                placeholder="e.g., MyCustomFont"
-                className={cn(
-                  "text-xs mt-1",
-                  isFontFamilyInherited &&
-                    customFontName === computedStyles.fontFamily &&
-                    "border-blue-300 border-dashed"
-                )}
-                onBlur={applyCustomFont}
-              />
-              {isFontFamilyInherited &&
-                customFontName === computedStyles.fontFamily && (
-                  <p className="text-xs text-blue-600 mt-1">Name inherited</p>
-                )}
-            </div>
-            <div>
-              <Label className="text-xs text-gray-600">
-                Font File URL (.woff2, .woff, .ttf)
-              </Label>
-              <Input
-                value={customFontUrl}
-                onChange={(e) => setCustomFontUrl(e.target.value)}
-                placeholder="https://example.com/font.woff2"
-                className={cn(
-                  "text-xs mt-1",
-                  isFontUrlInherited &&
-                    customFontUrl === computedStyles.fontFaceUrl &&
-                    "border-blue-300 border-dashed"
-                )}
-                onBlur={applyCustomFont}
-              />
-              {isFontUrlInherited &&
-                customFontUrl === computedStyles.fontFaceUrl && (
-                  <p className="text-xs text-blue-600 mt-1">URL inherited</p>
-                )}
-            </div>
-          </div>
-        )}
-
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <Label className="text-xs text-gray-600">Font Size</Label>
-            {isFontSizeInherited && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
-                onClick={() => resetStyleToDesktop("fontSize")}
-                title="Reset Font Size"
-              >
-                <RotateCcw className="w-3 h-3" />
-              </Button>
-            )}
-          </div>
-          <div className="grid grid-cols-3 gap-1 mb-2">
-            {FONT_SIZES.map((size) => (
-              <Button
-                key={size.value}
-                variant={
-                  computedStyles.fontSize === size.value ? "default" : "outline"
-                }
-                size="sm"
-                className={cn(
-                  "h-8 text-xs",
-                  isFontSizeInherited && "border-blue-300 border-dashed"
-                )}
-                onClick={() => updateStyle("fontSize", size.value)}
-              >
-                {size.name}
-              </Button>
-            ))}
-          </div>
-          <Input
-            value={computedStyles.fontSize || "16px"}
-            onChange={(e) => updateStyle("fontSize", e.target.value)}
-            placeholder="16px"
-            className={cn(
-              "text-xs",
-              isFontSizeInherited && "border-blue-300 border-dashed"
-            )}
-          />
-          {isFontSizeInherited && (
-            <p className="text-xs text-blue-600 mt-1">Inherited from desktop</p>
-          )}
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          <Button
-            variant={
-              computedStyles.fontWeight === "bold" ? "default" : "outline"
-            }
-            size="sm"
-            onClick={() =>
-              updateStyle(
-                "fontWeight",
-                computedStyles.fontWeight === "bold" ? "normal" : "bold"
-              )
-            }
-          >
-            <Bold className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={
-              computedStyles.fontStyle === "italic" ? "default" : "outline"
-            }
-            size="sm"
-            onClick={() =>
-              updateStyle(
-                "fontStyle",
-                computedStyles.fontStyle === "italic" ? "normal" : "italic"
-              )
-            }
-          >
-            <Italic className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={
-              computedStyles.textDecoration === "underline"
-                ? "default"
-                : "outline"
-            }
-            size="sm"
-            onClick={() =>
-              updateStyle(
-                "textDecoration",
+              <Bold className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={
+                computedStyles.fontStyle === "italic" ? "default" : "outline"
+              }
+              size="sm"
+              onClick={() =>
+                updateStyle(
+                  "fontStyle",
+                  computedStyles.fontStyle === "italic" ? "normal" : "italic"
+                )
+              }
+            >
+              <Italic className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={
                 computedStyles.textDecoration === "underline"
-                  ? "none"
-                  : "underline"
-              )
-            }
-          >
-            <Underline className="w-4 h-4" />
-          </Button>
-        </div>
-
-        <div>
-          <Label className="text-xs text-gray-600 mb-2 block">
-            Text Alignment
-          </Label>
-          <div className="grid grid-cols-4 gap-1">
-            {[
-              { value: "left", icon: AlignLeft },
-              { value: "center", icon: AlignCenter },
-              { value: "right", icon: AlignRight },
-              { value: "justify", icon: AlignJustify },
-            ].map(({ value, icon: Icon }) => (
-              <Button
-                key={value}
-                variant={
-                  computedStyles.textAlign === value ? "default" : "outline"
-                }
-                size="sm"
-                onClick={() => updateStyle("textAlign", value)}
-              >
-                <Icon className="w-4 h-4" />
-              </Button>
-            ))}
+                  ? "default"
+                  : "outline"
+              }
+              size="sm"
+              onClick={() =>
+                updateStyle(
+                  "textDecoration",
+                  computedStyles.textDecoration === "underline"
+                    ? "none"
+                    : "underline"
+                )
+              }
+            >
+              <Underline className="w-4 h-4" />
+            </Button>
           </div>
+
+          {/* Text Align */}
+          <div>
+            <Label className="text-[10px] text-gray-600 mb-2 block">
+              Text Alignment
+            </Label>
+            <div className="grid grid-cols-4 gap-1">
+              {[
+                { value: "left", icon: AlignLeft },
+                { value: "center", icon: AlignCenter },
+                { value: "right", icon: AlignRight },
+                { value: "justify", icon: AlignJustify },
+              ].map(({ value, icon: Icon }) => (
+                <Button
+                  key={value}
+                  variant={
+                    computedStyles.textAlign === value ? "default" : "outline"
+                  }
+                  size="sm"
+                  onClick={() => updateStyle("textAlign", value)}
+                >
+                  <Icon className="w-4 h-4" />
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Color Picker */}
+          <ColorPicker
+            value={computedStyles.color || "#000000"}
+            onChange={(value) => updateStyle("color", value)}
+            label="Text Color"
+            isInherited={isColorInherited}
+            onReset={() => resetStyleToDesktop("color")}
+          />
         </div>
-        <ColorPicker
-          value={computedStyles.color || "#000000"}
-          onChange={(value) => updateStyle("color", value)}
-          label="Text Color"
-          isInherited={isColorInherited}
-          onReset={() => resetStyleToDesktop("color")}
-        />
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }
 
@@ -1216,7 +1247,7 @@ function AdvancedSpacingControl({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <Label className="text-sm font-medium text-gray-700">{label}</Label>
+        <Label className="text-xs font-medium text-gray-700">{label}</Label>
         <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
           <Button
             variant={isLinked ? "default" : "ghost"}
@@ -1246,7 +1277,7 @@ function AdvancedSpacingControl({
             value={computedStyles[type] || "0px"}
             onChange={(e) => handleShorthandChange(e.target.value)}
             className={cn(
-              "text-sm h-9",
+              "text-xs h-9",
               isShorthandInherited() && "border-blue-300 border-dashed"
             )}
           />
@@ -1271,11 +1302,13 @@ function AdvancedSpacingControl({
                 value={getSideValue(side)}
                 onChange={(e) => handleIndividualChange(side, e.target.value)}
                 className={cn(
-                  "text-sm h-9 text-center",
+                  "text-xs h-9 text-center",
                   isSideInherited(side) && "border-blue-300 border-dashed"
                 )}
               />
-              <Label className="text-xs text-gray-500 mt-1">{side[0]}</Label>
+              <Label className="text-[10px] text-gray-500 mt-1">
+                {side[0]}
+              </Label>
               {isSideInherited(side) && (
                 <Button
                   variant="ghost"
@@ -1297,10 +1330,14 @@ function AdvancedSpacingControl({
 
 function SpacingControls({ selectedElement, updateStyle }: any) {
   const { state, dispatch } = useEditor();
+  const [isOpen, setIsOpen] = useState(true); // make it toggleable like others
+  const toggleOpen = () => setIsOpen((prev) => !prev);
+
   const computedStyles = getComputedStyles(
     selectedElement,
     state.currentBreakpoint
   );
+
   const hasSpecificStyles =
     state.currentBreakpoint !== "desktop" &&
     hasBreakpointStyles(selectedElement, state.currentBreakpoint);
@@ -1331,47 +1368,55 @@ function SpacingControls({ selectedElement, updateStyle }: any) {
       },
     });
   };
+
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm flex items-center justify-between">
-          <span className="flex items-center gap-2">
-            <SpacingIcon className="w-4 h-4" /> Spacing
-          </span>
+    <div className="py-2">
+      <CardHeader className="p-0 cursor-pointer" onClick={toggleOpen}>
+        <CardTitle className="text-xs font-normal flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {/* <SpacingIcon className="w-4 h-4" /> */}
+            Spacing
+          </div>
           <div className="flex items-center gap-2">
             {hasSpecificStyles && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-[10px]">
                 Custom
               </Badge>
             )}
-            <Badge variant="outline" className="text-xs">
+            {/* <Badge variant="outline" className="text-[10px]">
               {state.currentBreakpoint}
-            </Badge>
+            </Badge> */}
+            {isOpen ? (
+              <ChevronDown className="w-4 h-4 text-gray-500" />
+            ) : (
+              <ChevronRight className="w-4 h-4 text-gray-500" />
+            )}
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <AdvancedSpacingControl
-          label="Padding"
-          type="padding"
-          selectedElement={selectedElement}
-          updateStyle={updateStyle}
-          computedStyles={computedStyles}
-          resetStyle={resetStyle}
-        />
-        <AdvancedSpacingControl
-          label="Margin"
-          type="margin"
-          selectedElement={selectedElement}
-          updateStyle={updateStyle}
-          computedStyles={computedStyles}
-          resetStyle={resetStyle}
-        />
-      </CardContent>
-    </Card>
+      {isOpen && (
+        <div className="space-y-4 pt-4">
+          <AdvancedSpacingControl
+            label="Padding"
+            type="padding"
+            selectedElement={selectedElement}
+            updateStyle={updateStyle}
+            computedStyles={computedStyles}
+            resetStyle={resetStyle}
+          />
+          <AdvancedSpacingControl
+            label="Margin"
+            type="margin"
+            selectedElement={selectedElement}
+            updateStyle={updateStyle}
+            computedStyles={computedStyles}
+            resetStyle={resetStyle}
+          />
+        </div>
+      )}
+    </div>
   );
 }
-
 function ImageControl({ selectedElement, updateAttribute, updateStyle }: any) {
   const { state, dispatch } = useEditor();
   const src = selectedElement.attributes?.src || "";
@@ -1407,13 +1452,13 @@ function ImageControl({ selectedElement, updateAttribute, updateStyle }: any) {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm flex items-center gap-2">
+        <CardTitle className="text-xs font-normal flex items-center gap-2">
           <ImageIcon className="w-4 h-4" /> Image Settings
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <Label className="text-xs text-gray-600 mb-2 block">
+          <Label className="text-[10px] text-gray-600 mb-2 block">
             Image Source
           </Label>
           <div className="flex items-center gap-2">
@@ -1444,7 +1489,7 @@ function ImageControl({ selectedElement, updateAttribute, updateStyle }: any) {
           </div>
         </div>
         <div>
-          <Label htmlFor="alt-text" className="text-xs text-gray-600">
+          <Label htmlFor="alt-text" className="text-[10px] text-gray-600">
             Alt Text
           </Label>
           <Input
@@ -1456,7 +1501,7 @@ function ImageControl({ selectedElement, updateAttribute, updateStyle }: any) {
           />
         </div>
         <div>
-          <Label htmlFor="object-fit" className="text-xs text-gray-600">
+          <Label htmlFor="object-fit" className="text-[10px] text-gray-600">
             Object Fit
           </Label>
           <Select
@@ -1476,7 +1521,10 @@ function ImageControl({ selectedElement, updateAttribute, updateStyle }: any) {
           </Select>
         </div>
         <div>
-          <Label htmlFor="object-position" className="text-xs text-gray-600">
+          <Label
+            htmlFor="object-position"
+            className="text-[10px] text-gray-600"
+          >
             Object Position
           </Label>
           <Input
@@ -1524,13 +1572,13 @@ function VideoControl({ selectedElement, updateAttribute }: any) {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm flex items-center gap-2">
+        <CardTitle className="text-xs font-normal flex items-center gap-2">
           <Video className="w-4 h-4" /> Video Settings
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <Label className="text-xs text-gray-600 mb-2 block">
+          <Label className="text-[10px] text-gray-600 mb-2 block">
             Video Source
           </Label>
           <div className="aspect-video rounded-md bg-black flex items-center justify-center overflow-hidden mb-2">
@@ -1557,7 +1605,7 @@ function VideoControl({ selectedElement, updateAttribute }: any) {
         <div className="space-y-3">
           {Object.entries(videoAttributes).map(([key, value]) => (
             <div key={key} className="flex items-center justify-between">
-              <Label htmlFor={`video-${key}`} className="text-sm capitalize">
+              <Label htmlFor={`video-${key}`} className="text-xs capitalize">
                 {key}
               </Label>
               <Switch
@@ -1638,61 +1686,61 @@ function ShadowEditorPopover({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="offsetX" className="text-xs">
+              <Label htmlFor="offsetX" className="text-[10px]">
                 X Offset
               </Label>
               <Input
                 id="offsetX"
                 value={editedShadow.offsetX}
                 onChange={(e) => handleChange("offsetX", e.target.value)}
-                className="mt-1 h-8 text-xs"
+                className="mt-1 h-8 text-[10px]"
                 placeholder="0px"
               />
             </div>
             <div>
-              <Label htmlFor="offsetY" className="text-xs">
+              <Label htmlFor="offsetY" className="text-[10px]">
                 Y Offset
               </Label>
               <Input
                 id="offsetY"
                 value={editedShadow.offsetY}
                 onChange={(e) => handleChange("offsetY", e.target.value)}
-                className="mt-1 h-8 text-xs"
+                className="mt-1 h-8 text-[10px]"
                 placeholder="0px"
               />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="blurRadius" className="text-xs">
+              <Label htmlFor="blurRadius" className="text-[10px]">
                 Blur
               </Label>
               <Input
                 id="blurRadius"
                 value={editedShadow.blurRadius}
                 onChange={(e) => handleChange("blurRadius", e.target.value)}
-                className="mt-1 h-8 text-xs"
+                className="mt-1 h-8 text-[10px]"
                 placeholder="5px"
               />
             </div>
             {/* Only show spread for box-shadow, assuming text-shadow won't pass spreadRadius here */}
             {editedShadow.spreadRadius !== undefined && (
               <div>
-                <Label htmlFor="spreadRadius" className="text-xs">
+                <Label htmlFor="spreadRadius" className="text-[10px]">
                   Spread
                 </Label>
                 <Input
                   id="spreadRadius"
                   value={editedShadow.spreadRadius}
                   onChange={(e) => handleChange("spreadRadius", e.target.value)}
-                  className="mt-1 h-8 text-xs"
+                  className="mt-1 h-8 text-[10px]"
                   placeholder="0px"
                 />
               </div>
             )}
           </div>
           <div>
-            <Label className="text-xs">Color</Label>
+            <Label className="text-[10px]">Color</Label>
             <ColorPicker
               value={editedShadow.color}
               onChange={(color) => handleChange("color", color)}
@@ -1867,7 +1915,7 @@ function ShadowsControl({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <Label className="text-sm font-medium text-gray-700">{label}</Label>
+        <Label className="text-xs font-medium text-gray-700">{label}</Label>
         <div className="flex items-center">
           {isInherited && (
             <Button
@@ -1891,7 +1939,7 @@ function ShadowsControl({
         </div>
       </div>
       {shadows.length === 0 && (
-        <p className="text-xs text-gray-400">
+        <p className="text-[10px] text-gray-400">
           No {label.toLowerCase()} applied.
         </p>
       )}
@@ -1899,7 +1947,7 @@ function ShadowsControl({
         {shadows.map((shadow, index) => (
           <div
             key={index}
-            className="flex items-center justify-between p-2 bg-gray-50 rounded text-xs"
+            className="flex items-center justify-between p-2 bg-gray-50 rounded text-[10px]"
           >
             <span
               className="truncate w-40"
@@ -1946,7 +1994,7 @@ function ShadowsControl({
         ))}
       </div>
       {isInherited && shadows.length > 0 && (
-        <p className="text-xs text-blue-600 mt-1">Inherited from desktop</p>
+        <p className="text-[10px] text-blue-600 mt-1">Inherited from desktop</p>
       )}
       {editingShadow !== null && (
         <ShadowEditorPopover
@@ -2092,7 +2140,7 @@ function AdvancedBorderControl({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <Label className="text-sm font-medium text-gray-700">Border</Label>
+        <Label className="text-xs font-medium text-gray-700">Border</Label>
         <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
           <Button
             variant={isLinked ? "default" : "ghost"}
@@ -2125,7 +2173,7 @@ function AdvancedBorderControl({
                 handleShorthandChange("borderWidth", e.target.value)
               }
               className={cn(
-                "text-sm h-9 w-1/3",
+                "text-xs h-9 w-1/3",
                 isShorthandInherited("borderWidth") &&
                   "border-blue-300 border-dashed"
               )}
@@ -2137,7 +2185,7 @@ function AdvancedBorderControl({
             >
               <SelectTrigger
                 className={cn(
-                  "text-sm h-9 w-1/3",
+                  "text-xs h-9 w-1/3",
                   isShorthandInherited("borderStyle") &&
                     "border-blue-300 border-dashed"
                 )}
@@ -2166,7 +2214,7 @@ function AdvancedBorderControl({
           {(isShorthandInherited("borderWidth") ||
             isShorthandInherited("borderStyle") ||
             isShorthandInherited("borderColor")) && (
-            <p className="text-xs text-blue-600 mt-1">
+            <p className="text-[10px] text-blue-600 mt-1">
               One or more border properties inherited.
             </p>
           )}
@@ -2175,7 +2223,7 @@ function AdvancedBorderControl({
         <div className="space-y-3">
           {sides.map((side) => (
             <div key={side}>
-              <Label className="text-xs text-gray-500 mb-1 block">
+              <Label className="text-[10px] text-gray-500 mb-1 block">
                 {side} Border
               </Label>
               <div className="flex items-center gap-2">
@@ -2186,7 +2234,7 @@ function AdvancedBorderControl({
                     handleIndividualChange(side, "Width", e.target.value)
                   }
                   className={cn(
-                    "text-sm h-9 w-1/3",
+                    "text-xs h-9 w-1/3",
                     isSideInherited(side, "Width") &&
                       "border-blue-300 border-dashed"
                   )}
@@ -2200,7 +2248,7 @@ function AdvancedBorderControl({
                 >
                   <SelectTrigger
                     className={cn(
-                      "text-sm h-9 w-1/3",
+                      "text-xs h-9 w-1/3",
                       isSideInherited(side, "Style") &&
                         "border-blue-300 border-dashed"
                     )}
@@ -2229,7 +2277,7 @@ function AdvancedBorderControl({
               {(isSideInherited(side, "Width") ||
                 isSideInherited(side, "Style") ||
                 isSideInherited(side, "Color")) && (
-                <p className="text-xs text-blue-600 mt-1">
+                <p className="text-[10px] text-blue-600 mt-1">
                   {side} border properties may be inherited.
                 </p>
               )}
@@ -2293,7 +2341,7 @@ function AdvancedBorderRadiusControl({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <Label className="text-sm font-medium text-gray-700">
+        <Label className="text-xs font-medium text-gray-700">
           Border Radius
         </Label>
         <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
@@ -2324,7 +2372,7 @@ function AdvancedBorderRadiusControl({
             value={getShorthandValue()}
             onChange={(e) => handleShorthandChange(e.target.value)}
             className={cn(
-              "text-sm h-9",
+              "text-xs h-9",
               isShorthandInherited() && "border-blue-300 border-dashed"
             )}
           />
@@ -2344,7 +2392,7 @@ function AdvancedBorderRadiusControl({
         <div className="grid grid-cols-2 gap-x-2 gap-y-3">
           {corners.map((corner) => (
             <div key={corner} className="relative">
-              <Label className="text-xs text-gray-500 mb-1 block">
+              <Label className="text-[10px] text-gray-500 mb-1 block">
                 {corner.replace(/([A-Z])/g, " $1").trim()}
               </Label>
               <Input
@@ -2352,7 +2400,7 @@ function AdvancedBorderRadiusControl({
                 value={getCornerValue(corner)}
                 onChange={(e) => handleIndividualChange(corner, e.target.value)}
                 className={cn(
-                  "text-sm h-9",
+                  "text-xs h-9",
                   isCornerInherited(corner) && "border-blue-300 border-dashed"
                 )}
               />
@@ -2508,7 +2556,7 @@ function FiltersControl({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <Label className="text-sm font-medium text-gray-700">Filters</Label>
+        <Label className="text-xs font-medium text-gray-700">Filters</Label>
         <div className="flex items-center">
           {isInherited && (
             <Button
@@ -2532,7 +2580,7 @@ function FiltersControl({
         </div>
       </div>
       {filters.length === 0 && (
-        <p className="text-xs text-gray-400">No filters applied.</p>
+        <p className="text-[10px] text-gray-400">No filters applied.</p>
       )}
       <div className="space-y-3">
         {filters.map((filter) => (
@@ -2546,7 +2594,7 @@ function FiltersControl({
                 handleFilterChange(filter.id, "type", val)
               }
             >
-              <SelectTrigger className="text-xs h-8 w-[120px]">
+              <SelectTrigger className="text-[10px] h-8 w-[120px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -2563,14 +2611,14 @@ function FiltersControl({
               onChange={(e) =>
                 handleFilterChange(filter.id, "value", e.target.value)
               }
-              className="text-xs h-8 flex-grow"
+              className="text-[10px] h-8 flex-grow"
               placeholder={
                 filterTypes.find((f) => f.value === filter.type)?.default ||
                 "value"
               }
             />
             {filter.unit && (
-              <span className="text-xs text-gray-500">{filter.unit}</span>
+              <span className="text-[10px] text-gray-500">{filter.unit}</span>
             )}
             <Button
               variant="ghost"
@@ -2584,7 +2632,7 @@ function FiltersControl({
         ))}
       </div>
       {isInherited && filters.length > 0 && (
-        <p className="text-xs text-blue-600 mt-1">Inherited from desktop</p>
+        <p className="text-[10px] text-blue-600 mt-1">Inherited from desktop</p>
       )}
     </div>
   );
@@ -2592,10 +2640,14 @@ function FiltersControl({
 
 function AppearanceControls({ selectedElement, updateStyle }: any) {
   const { state, dispatch } = useEditor();
+  const [isOpen, setIsOpen] = useState(true);
+  const toggleOpen = () => setIsOpen((prev) => !prev);
+
   const computedStyles = getComputedStyles(
     selectedElement,
     state.currentBreakpoint
   );
+
   const hasSpecificStyles =
     state.currentBreakpoint !== "desktop" &&
     hasBreakpointStyles(selectedElement, state.currentBreakpoint);
@@ -2655,222 +2707,333 @@ function AppearanceControls({ selectedElement, updateStyle }: any) {
   ]);
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm flex items-center justify-between">
-          <span className="flex items-center gap-2">
-            <Palette className="w-4 h-4" /> Appearance
-          </span>
+    <div className="py-2">
+      <CardHeader className="p-0 cursor-pointer" onClick={toggleOpen}>
+        <CardTitle className="text-xs font-normal flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {/* <Palette className="w-4 h-4" /> */}
+            Appearance
+          </div>
           <div className="flex items-center gap-2">
             {hasSpecificStyles && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-[10px]">
                 Custom
               </Badge>
             )}
-            <Badge variant="outline" className="text-xs">
+            {/* <Badge variant="outline" className="text-[10px]">
               {state.currentBreakpoint}
-            </Badge>
+            </Badge> */}
+            {isOpen ? (
+              <ChevronDown className="w-4 h-4 text-gray-500" />
+            ) : (
+              <ChevronRight className="w-4 h-4 text-gray-500" />
+            )}
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <ColorPicker
-          value={computedStyles.backgroundColor || "transparent"}
-          onChange={(value) => updateStyle("backgroundColor", value)}
-          label="Background Color"
-          isInherited={isBgColorInherited}
-          onReset={() => resetStyleToDesktop("backgroundColor")}
-        />
 
-        <AdvancedBorderControl
-          selectedElement={selectedElement}
-          updateStyle={updateStyle}
-          computedStyles={computedStyles}
-          resetStyle={resetStyleToDesktop}
-        />
+      {isOpen && (
+        <div className="space-y-4 pt-4">
+          <ColorPicker
+            value={computedStyles.backgroundColor || "transparent"}
+            onChange={(value) => updateStyle("backgroundColor", value)}
+            label="Background Color"
+            isInherited={isBgColorInherited}
+            onReset={() => resetStyleToDesktop("backgroundColor")}
+          />
 
-        <AdvancedBorderRadiusControl
-          selectedElement={selectedElement}
-          updateStyle={updateStyle}
-          computedStyles={computedStyles}
-          resetStyle={resetStyleToDesktop}
-        />
+          <AdvancedBorderControl
+            selectedElement={selectedElement}
+            updateStyle={updateStyle}
+            computedStyles={computedStyles}
+            resetStyle={resetStyleToDesktop}
+          />
 
-        <ShadowsControl
-          label="Box Shadow"
-          styleKey="boxShadow"
-          selectedElement={selectedElement}
-          updateStyle={updateStyle}
-          computedStyles={computedStyles}
-          resetStyle={resetStyleToDesktop}
-        />
+          <AdvancedBorderRadiusControl
+            selectedElement={selectedElement}
+            updateStyle={updateStyle}
+            computedStyles={computedStyles}
+            resetStyle={resetStyleToDesktop}
+          />
 
-        <ShadowsControl
-          label="Text Shadow"
-          styleKey="textShadow"
-          selectedElement={selectedElement}
-          updateStyle={updateStyle}
-          computedStyles={computedStyles}
-          resetStyle={resetStyleToDesktop}
-        />
+          <ShadowsControl
+            label="Box Shadow"
+            styleKey="boxShadow"
+            selectedElement={selectedElement}
+            updateStyle={updateStyle}
+            computedStyles={computedStyles}
+            resetStyle={resetStyleToDesktop}
+          />
 
-        <div>
-          <Label className="text-sm font-medium text-gray-700 mb-2 block">
-            Background Image
-          </Label>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Input
-                type="text"
-                placeholder="url(...)"
-                value={computedStyles.backgroundImage || ""}
-                onChange={(e) => updateStyle("backgroundImage", e.target.value)}
-                className="text-xs h-9 flex-grow"
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-9 px-2"
-                onClick={handleBgImageFromAssets}
-                title="Choose from Assets"
-              >
-                <ImageIconLucide className="w-3.5 h-3.5" />
-              </Button>
+          <ShadowsControl
+            label="Text Shadow"
+            styleKey="textShadow"
+            selectedElement={selectedElement}
+            updateStyle={updateStyle}
+            computedStyles={computedStyles}
+            resetStyle={resetStyleToDesktop}
+          />
+
+          <div>
+            <Label className="text-xs font-medium text-gray-700 mb-2 block">
+              Background Image
+            </Label>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Input
+                  type="text"
+                  placeholder="url(...)"
+                  value={computedStyles.backgroundImage || ""}
+                  onChange={(e) =>
+                    updateStyle("backgroundImage", e.target.value)
+                  }
+                  className="text-[10px] h-9 flex-grow"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-9 px-2"
+                  onClick={handleBgImageFromAssets}
+                  title="Choose from Assets"
+                >
+                  <ImageIconLucide className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <Select
+                  value={computedStyles.backgroundSize || "auto"}
+                  onValueChange={(v) => updateStyle("backgroundSize", v)}
+                >
+                  <SelectTrigger className="text-[10px] h-9">
+                    <SelectValue placeholder="Size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">Auto</SelectItem>
+                    <SelectItem value="cover">Cover</SelectItem>
+                    <SelectItem value="contain">Contain</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  value={computedStyles.backgroundRepeat || "repeat"}
+                  onValueChange={(v) => updateStyle("backgroundRepeat", v)}
+                >
+                  <SelectTrigger className="text-[10px] h-9">
+                    <SelectValue placeholder="Repeat" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="repeat">Repeat</SelectItem>
+                    <SelectItem value="no-repeat">No Repeat</SelectItem>
+                    <SelectItem value="repeat-x">Repeat X</SelectItem>
+                    <SelectItem value="repeat-y">Repeat Y</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Input
+                  type="text"
+                  placeholder="Position"
+                  value={computedStyles.backgroundPosition || ""}
+                  onChange={(e) =>
+                    updateStyle("backgroundPosition", e.target.value)
+                  }
+                  className="text-[10px] h-9"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Overflow Controls */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <Label className="text-xs font-medium text-gray-700">
+                Overflow
+              </Label>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              <Select
-                value={computedStyles.backgroundSize || "auto"}
-                onValueChange={(v) => updateStyle("backgroundSize", v)}
-              >
-                <SelectTrigger className="text-xs h-9">
-                  <SelectValue placeholder="Size" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="auto">Auto</SelectItem>
-                  <SelectItem value="cover">Cover</SelectItem>
-                  <SelectItem value="contain">Contain</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={computedStyles.backgroundRepeat || "repeat"}
-                onValueChange={(v) => updateStyle("backgroundRepeat", v)}
-              >
-                <SelectTrigger className="text-xs h-9">
-                  <SelectValue placeholder="Repeat" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="repeat">Repeat</SelectItem>
-                  <SelectItem value="no-repeat">No Repeat</SelectItem>
-                  <SelectItem value="repeat-x">Repeat X</SelectItem>
-                  <SelectItem value="repeat-y">Repeat Y</SelectItem>
-                </SelectContent>
-              </Select>
+              <div>
+                <Label
+                  htmlFor="overflow-all"
+                  className="text-[10px] text-gray-500 mb-1 block"
+                >
+                  Overall
+                </Label>
+                <Select
+                  value={computedStyles.overflow || "visible"}
+                  onValueChange={(v) => updateStyle("overflow", v)}
+                >
+                  <SelectTrigger id="overflow-all" className="text-[10px] h-9">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="visible">Visible</SelectItem>
+                    <SelectItem value="hidden">Hidden</SelectItem>
+                    <SelectItem value="scroll">Scroll</SelectItem>
+                    <SelectItem value="auto">Auto</SelectItem>
+                    <SelectItem value="clip">Clip</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label
+                  htmlFor="overflow-x"
+                  className="text-[10px] text-gray-500 mb-1 block"
+                >
+                  X-Axis
+                </Label>
+                <Select
+                  value={computedStyles.overflowX || "visible"}
+                  onValueChange={(v) => updateStyle("overflowX", v)}
+                >
+                  <SelectTrigger id="overflow-x" className="text-[10px] h-9">
+                    <SelectValue placeholder="X Axis" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="visible">Visible</SelectItem>
+                    <SelectItem value="hidden">Hidden</SelectItem>
+                    <SelectItem value="scroll">Scroll</SelectItem>
+                    <SelectItem value="auto">Auto</SelectItem>
+                    <SelectItem value="clip">Clip</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label
+                  htmlFor="overflow-y"
+                  className="text-[10px] text-gray-500 mb-1 block"
+                >
+                  Y-Axis
+                </Label>
+                <Select
+                  value={computedStyles.overflowY || "visible"}
+                  onValueChange={(v) => updateStyle("overflowY", v)}
+                >
+                  <SelectTrigger id="overflow-y" className="text-[10px] h-9">
+                    <SelectValue placeholder="Y Axis" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="visible">Visible</SelectItem>
+                    <SelectItem value="hidden">Hidden</SelectItem>
+                    <SelectItem value="scroll">Scroll</SelectItem>
+                    <SelectItem value="auto">Auto</SelectItem>
+                    <SelectItem value="clip">Clip</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <FiltersControl
+            selectedElement={selectedElement}
+            updateStyle={updateStyle}
+            computedStyles={computedStyles}
+            resetStyle={resetStyleToDesktop}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SizeControls({
+  selectedElement,
+  updateStyle,
+  computedStyles,
+  state,
+}: {
+  selectedElement: any;
+  updateStyle: (key: string, value: any) => void;
+  computedStyles: any;
+  state: any;
+}) {
+  const [isOpen, setIsOpen] = useState(true);
+  const toggleOpen = () => setIsOpen((prev) => !prev);
+
+  const currentBreakpointStyles =
+    selectedElement.styles[state.currentBreakpoint] || {};
+  const hasSpecificStyles =
+    state.currentBreakpoint !== "desktop" &&
+    (currentBreakpointStyles?.width ||
+      currentBreakpointStyles?.height ||
+      currentBreakpointStyles?.minWidth ||
+      currentBreakpointStyles?.maxWidth);
+
+  return (
+    <div className="py-2">
+      <CardHeader className="p-0 cursor-pointer" onClick={toggleOpen}>
+        <CardTitle className="text-xs font-normal flex items-center justify-between">
+          <span className="flex items-center gap-1">Size</span>
+          <div className="flex items-center gap-2">
+            {hasSpecificStyles && (
+              <Badge variant="secondary" className="text-[10px]">
+                Custom
+              </Badge>
+            )}
+            {/* <Badge variant="outline" className="text-[10px]">
+              {state.currentBreakpoint}
+            </Badge> */}
+            {isOpen ? (
+              <ChevronDown className="w-[14px] h-[14px] text-gray-500" />
+            ) : (
+              <ChevronRight className="w-[14px] h-[14px] text-gray-500" />
+            )}
+          </div>
+        </CardTitle>
+      </CardHeader>
+
+      {isOpen && (
+        <div className="space-y-3 pt-4">
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label className="text-[10px] text-gray-600">Width</Label>
               <Input
-                type="text"
-                placeholder="Position"
-                value={computedStyles.backgroundPosition || ""}
-                onChange={(e) =>
-                  updateStyle("backgroundPosition", e.target.value)
-                }
-                className="text-xs h-9"
+                value={computedStyles.width || ""}
+                onChange={(e) => updateStyle("width", e.target.value)}
+                placeholder="auto"
+                className="mt-1 text-[10px]"
+              />
+            </div>
+            <div>
+              <Label className="text-[10px] text-gray-600">Height</Label>
+              <Input
+                value={computedStyles.height || ""}
+                onChange={(e) => updateStyle("height", e.target.value)}
+                placeholder="auto"
+                className="mt-1 text-[10px]"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label className="text-[10px] text-gray-600">Min Width</Label>
+              <Input
+                value={computedStyles.minWidth || ""}
+                onChange={(e) => updateStyle("minWidth", e.target.value)}
+                placeholder="0"
+                className="mt-1 text-[10px]"
+              />
+            </div>
+            <div>
+              <Label className="text-[10px] text-gray-600">Max Width</Label>
+              <Input
+                value={computedStyles.maxWidth || ""}
+                onChange={(e) => updateStyle("maxWidth", e.target.value)}
+                placeholder="none"
+                className="mt-1 text-[10px]"
               />
             </div>
           </div>
         </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <Label className="text-sm font-medium text-gray-700">
-              Overflow
-            </Label>
-            {/* Add reset button if needed */}
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            <div>
-              <Label
-                htmlFor="overflow-all"
-                className="text-xs text-gray-500 mb-1 block"
-              >
-                Overall
-              </Label>
-              <Select
-                value={computedStyles.overflow || "visible"}
-                onValueChange={(v) => updateStyle("overflow", v)}
-              >
-                <SelectTrigger id="overflow-all" className="text-xs h-9">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="visible">Visible</SelectItem>
-                  <SelectItem value="hidden">Hidden</SelectItem>
-                  <SelectItem value="scroll">Scroll</SelectItem>
-                  <SelectItem value="auto">Auto</SelectItem>
-                  <SelectItem value="clip">Clip</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label
-                htmlFor="overflow-x"
-                className="text-xs text-gray-500 mb-1 block"
-              >
-                X-Axis
-              </Label>
-              <Select
-                value={computedStyles.overflowX || "visible"}
-                onValueChange={(v) => updateStyle("overflowX", v)}
-              >
-                <SelectTrigger id="overflow-x" className="text-xs h-9">
-                  <SelectValue placeholder="X Axis" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="visible">Visible</SelectItem>
-                  <SelectItem value="hidden">Hidden</SelectItem>
-                  <SelectItem value="scroll">Scroll</SelectItem>
-                  <SelectItem value="auto">Auto</SelectItem>
-                  <SelectItem value="clip">Clip</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label
-                htmlFor="overflow-y"
-                className="text-xs text-gray-500 mb-1 block"
-              >
-                Y-Axis
-              </Label>
-              <Select
-                value={computedStyles.overflowY || "visible"}
-                onValueChange={(v) => updateStyle("overflowY", v)}
-              >
-                <SelectTrigger id="overflow-y" className="text-xs h-9">
-                  <SelectValue placeholder="Y Axis" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="visible">Visible</SelectItem>
-                  <SelectItem value="hidden">Hidden</SelectItem>
-                  <SelectItem value="scroll">Scroll</SelectItem>
-                  <SelectItem value="auto">Auto</SelectItem>
-                  <SelectItem value="clip">Clip</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-
-        <FiltersControl
-          selectedElement={selectedElement}
-          updateStyle={updateStyle}
-          computedStyles={computedStyles}
-          resetStyle={resetStyleToDesktop}
-        />
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }
 
 export function StylesTab() {
   const { state, dispatch } = useEditor();
+  const [activeTab, setActiveTab] = useState("style");
 
   const selectedElement = findElementById(
     state.elements,
@@ -2884,8 +3047,8 @@ export function StylesTab() {
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Palette className="w-8 h-8 text-gray-400" />
           </div>
-          <p className="text-sm text-gray-500 mb-2">No element selected</p>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-500 mb-2">No element selected</p>
+          <p className="text-[10px] text-gray-400">
             Click on an element to start styling
           </p>
         </div>
@@ -2947,24 +3110,24 @@ export function StylesTab() {
   const isVideo = selectedElement.tag === "video";
 
   return (
-    <div className="p-4">
+    <div className="p-3">
       <div className="flex items-center justify-between mb-2">
         <div>
-          <p className="text-xs text-[#4F5C68] ">Selected</p>
+          <p className="text-[10px] text-[#4F5C68]">Selected</p>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="bg-[#F4F6F8] py-1 px-2 rounded-md text-xs text-[#000000]">
+          <div className="bg-[#F4F6F8] py-1 px-2 rounded-md text-[10px] text-[#000000]">
             {selectedElement.type}
           </div>
 
           {hasSpecificStyles && (
-            <div className="bg-[#F4F6F8] py-1 px-2 rounded-md text-xs text-[#000000]">
+            <div className="bg-[#F4F6F8] py-1 px-2 rounded-md text-[10px] text-[#000000]">
               Custom {state.currentBreakpoint}
             </div>
           )}
 
-          <div className="bg-[#F4F6F8] py-1 px-2 rounded-md text-xs text-[#000000] flex items-center gap-1">
+          <div className="bg-[#F4F6F8] py-1 px-2 rounded-md text-[10px] text-[#000000] flex items-center gap-1">
             {state.currentBreakpoint === "desktop" && (
               <Monitor className="w-3 h-3" />
             )}
@@ -2979,125 +3142,93 @@ export function StylesTab() {
         </div>
       </div>
 
-      <div className="bg-[#F4F6F8] py-1.5 mb-6 px-2 items-center flex gap-2 text-xs rounded-md text-[#000000]">
+      <div className="bg-[#F4F6F8] py-1.5 mb-6 px-2 items-center flex gap-2 text-[10px] rounded-md text-[#000000]">
         <Layers size={12} />
         <h3>
           {selectedElement.tag} #{selectedElement.id.slice(0, 8)}
         </h3>
       </div>
 
+      {/* Tabs */}
+      <div className="flex space-x-1 mb-4">
+        <button
+          onClick={() => setActiveTab("style")}
+          className={`px-4 py-2 text-xs rounded-md flex-1 ${
+            activeTab === "style"
+              ? "bg-[#F4F6F8] text-black font-medium"
+              : "text-[#4F5C68] hover:bg-[#F4F6F8]/50"
+          }`}
+        >
+          Style
+        </button>
+        <button
+          onClick={() => setActiveTab("action")}
+          className={`px-4 py-2 text-xs rounded-md flex-1 ${
+            activeTab === "action"
+              ? "bg-[#F4F6F8] text-black font-medium"
+              : "text-[#4F5C68] hover:bg-[#F4F6F8]/50"
+          }`}
+        >
+          Action
+        </button>
+      </div>
+
       <ScrollArea className="h-[calc(100vh-200px)]">
-        {" "}
-        {/* Adjust height as needed */}
-        <div className="space-y-4 pb-4">
-          {" "}
-          {/* Added pb-4 for scroll spacing */}
-          {/* Add Attributes Control at the top */}
-          <AttributesControl
+        {activeTab === "style" ? (
+          <div className="space-y-4 pb-4">
+            <AttributesControl
+              selectedElement={selectedElement}
+              updateAttribute={updateAttribute}
+            />
+            {isImage && (
+              <ImageControl
+                selectedElement={selectedElement}
+                updateAttribute={updateAttribute}
+                updateStyle={updateStyle}
+              />
+            )}
+            {isVideo && (
+              <VideoControl
+                selectedElement={selectedElement}
+                updateAttribute={updateAttribute}
+              />
+            )}
+            {isCustomHtml && (
+              <CustomHtmlEditor
+                selectedElement={selectedElement}
+                updateContent={updateContent}
+              />
+            )}
+            {canHaveLayout && <LayoutBuilder />}
+            {!isCustomHtml && !isImage && !isVideo && (
+              <TypographyControls
+                selectedElement={selectedElement}
+                updateStyle={updateStyle}
+                updateContent={updateContent}
+              />
+            )}
+            <SpacingControls
+              selectedElement={selectedElement}
+              updateStyle={updateStyle}
+            />
+            <AppearanceControls
+              selectedElement={selectedElement}
+              updateStyle={updateStyle}
+            />
+            {/* Size Card */}
+            <SizeControls
+              selectedElement={selectedElement}
+              updateStyle={updateStyle}
+              computedStyles={computedStyles}
+              state={state}
+            />
+          </div>
+        ) : (
+          <ActionControls
             selectedElement={selectedElement}
             updateAttribute={updateAttribute}
           />
-          {isImage && (
-            <ImageControl
-              selectedElement={selectedElement}
-              updateAttribute={updateAttribute}
-              updateStyle={updateStyle}
-            />
-          )}
-          {isVideo && (
-            <VideoControl
-              selectedElement={selectedElement}
-              updateAttribute={updateAttribute}
-            />
-          )}
-          {isCustomHtml && (
-            <CustomHtmlEditor
-              selectedElement={selectedElement}
-              updateContent={updateContent}
-            />
-          )}
-          {canHaveLayout && <LayoutBuilder />}
-          {!isCustomHtml && !isImage && !isVideo && (
-            <TypographyControls
-              selectedElement={selectedElement}
-              updateStyle={updateStyle}
-              updateContent={updateContent}
-            />
-          )}
-          <SpacingControls
-            selectedElement={selectedElement}
-            updateStyle={updateStyle}
-          />
-          <AppearanceControls
-            selectedElement={selectedElement}
-            updateStyle={updateStyle}
-          />
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center justify-between">
-                Size
-                <div className="flex items-center gap-2">
-                  {hasSpecificStyles &&
-                    (selectedElement.styles[state.currentBreakpoint]?.width ||
-                      selectedElement.styles[state.currentBreakpoint]?.height ||
-                      selectedElement.styles[state.currentBreakpoint]
-                        ?.minWidth ||
-                      selectedElement.styles[state.currentBreakpoint]
-                        ?.maxWidth) && (
-                      <Badge variant="secondary" className="text-xs">
-                        Custom
-                      </Badge>
-                    )}
-                  <Badge variant="outline" className="text-xs">
-                    {state.currentBreakpoint}
-                  </Badge>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <Label className="text-xs text-gray-600">Width</Label>
-                  <Input
-                    value={computedStyles.width || ""}
-                    onChange={(e) => updateStyle("width", e.target.value)}
-                    placeholder="auto"
-                    className="mt-1 text-xs"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs text-gray-600">Height</Label>
-                  <Input
-                    value={computedStyles.height || ""}
-                    onChange={(e) => updateStyle("height", e.target.value)}
-                    placeholder="auto"
-                    className="mt-1 text-xs"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <Label className="text-xs text-gray-600">Min Width</Label>
-                  <Input
-                    value={computedStyles.minWidth || ""}
-                    onChange={(e) => updateStyle("minWidth", e.target.value)}
-                    placeholder="0"
-                    className="mt-1 text-xs"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs text-gray-600">Max Width</Label>
-                  <Input
-                    value={computedStyles.maxWidth || ""}
-                    onChange={(e) => updateStyle("maxWidth", e.target.value)}
-                    placeholder="none"
-                    className="mt-1 text-xs"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        )}
       </ScrollArea>
     </div>
   );
