@@ -12,12 +12,11 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 
 export function InteractionsTab() {
   const { state, dispatch } = useEditor();
-
   const selectedElement = findElementById(
     state.elements,
     state.selectedElement
@@ -25,8 +24,8 @@ export function InteractionsTab() {
 
   if (!state.selectedElement || !selectedElement) {
     return (
-      <div className="p-3">
-        <p className="text-xs text-gray-500 text-center py-6">
+      <div className="p-2">
+        <p className="text-[11px] text-gray-500 text-center py-4">
           Select an element to add interactions
         </p>
       </div>
@@ -35,7 +34,6 @@ export function InteractionsTab() {
 
   const updateInteraction = (interactionType: string, updates: any) => {
     const currentInteractions = selectedElement.interactions || {};
-
     dispatch({
       type: "UPDATE_ELEMENT",
       payload: {
@@ -57,14 +55,11 @@ export function InteractionsTab() {
     const currentInteractions = selectedElement.interactions || {};
     const newInteractions = { ...currentInteractions };
     delete newInteractions[interactionType];
-
     dispatch({
       type: "UPDATE_ELEMENT",
       payload: {
         id: state.selectedElement!,
-        updates: {
-          interactions: newInteractions,
-        },
+        updates: { interactions: newInteractions },
       },
     });
   };
@@ -85,14 +80,13 @@ export function InteractionsTab() {
   );
 
   return (
-    <div className="p-3 text-xs">
-      <h3 className="text-xs font-semibold text-gray-900 mb-3">
+    <div className="p-2 text-[11px]">
+      <h3 className="font-semibold text-gray-900 mb-2">
         Interactions — {selectedElement.tag} #{selectedElement.id.slice(0, 6)}
       </h3>
 
-      <ScrollArea className="h-[calc(100vh-170px)] pr-1">
-        <div className="space-y-3">
-          {/* ==== Click Actions ==== */}
+      <ScrollArea className="h-[calc(100vh-160px)] pr-1">
+        <div className="space-y-2">
           <StyledCard title="Click Actions">
             {selectedElement.interactions?.onClick ? (
               <ActionForm
@@ -106,16 +100,12 @@ export function InteractionsTab() {
               <AddActionButton
                 label="Add Click Action"
                 onClick={() =>
-                  updateInteraction("onClick", {
-                    action: "toggle",
-                    target: "",
-                  })
+                  updateInteraction("onClick", { action: "toggle", target: "" })
                 }
               />
             )}
           </StyledCard>
 
-          {/* ==== Hover Actions ==== */}
           <StyledCard title="Hover Actions">
             {selectedElement.interactions?.onHover ? (
               <ActionForm
@@ -135,15 +125,14 @@ export function InteractionsTab() {
             )}
           </StyledCard>
 
-          <Separator />
+          <Separator className="my-2" />
 
-          {/* ==== Quick Presets ==== */}
           <StyledCard title="Quick Presets">
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full justify-start text-xs"
+                className="w-full justify-start text-[11px] h-7"
                 onClick={() => {
                   const popupId = `popup-${Date.now()}`;
                   const popup = {
@@ -166,7 +155,6 @@ export function InteractionsTab() {
                     attributes: {},
                     children: [],
                   };
-
                   dispatch({
                     type: "ADD_ELEMENT",
                     payload: { element: popup },
@@ -183,7 +171,7 @@ export function InteractionsTab() {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full justify-start text-xs"
+                className="w-full justify-start text-[11px] h-7"
                 onClick={() => {
                   const dropdownId = `dropdown-${Date.now()}`;
                   const dropdown = {
@@ -205,7 +193,6 @@ export function InteractionsTab() {
                     attributes: {},
                     children: [],
                   };
-
                   dispatch({
                     type: "ADD_ELEMENT",
                     payload: {
@@ -229,8 +216,6 @@ export function InteractionsTab() {
   );
 }
 
-// 🟡 Shared Block Components
-
 function AddActionButton({
   label,
   onClick,
@@ -242,10 +227,10 @@ function AddActionButton({
     <Button
       variant="outline"
       size="sm"
-      className="w-full text-xs py-1"
+      className="w-full text-[11px] h-7"
       onClick={onClick}
     >
-      <Plus className="w-3 h-3 mr-2" />
+      <Plus className="w-3 h-3 mr-1" />
       {label}
     </Button>
   );
@@ -259,13 +244,11 @@ function StyledCard({
   children: React.ReactNode;
 }) {
   return (
-    <Card>
-      <CardHeader className="pb-2 pt-3 px-3">
-        <CardTitle className="text-xs font-semibold text-gray-800">
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3 px-3 pt-0 pb-3">{children}</CardContent>
+    <Card className="border-0 shadow-none">
+      <div className="px-2 py-1">
+        <h4 className="text-[11px] font-semibold text-gray-800">{title}</h4>
+      </div>
+      <CardContent className="space-y-2 p-2">{children}</CardContent>
     </Card>
   );
 }
@@ -284,13 +267,13 @@ function ActionForm({
   remove: (type: string) => void;
 }) {
   return (
-    <div className="space-y-3 p-2 bg-gray-50 rounded-md text-xs">
+    <div className="space-y-2 p-2 bg-gray-50 rounded-md text-[11px]">
       <div className="flex items-center justify-between">
         <Label className="text-[10px] font-medium">Action Type</Label>
         <Button
           variant="ghost"
           size="sm"
-          className="h-6 w-6 p-0 text-red-500"
+          className="h-5 w-5 p-0 text-red-500"
           onClick={() => remove(type)}
         >
           <Trash2 className="w-3 h-3" />

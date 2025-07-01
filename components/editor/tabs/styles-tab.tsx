@@ -72,6 +72,7 @@ import {
 } from "@/components/ui/popover";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"; // For inset/outset shadow
 import { ActionControls } from "./actionControll";
+import { InteractionsTab } from "./interactions-tab";
 
 // Define which elements can have layout controls
 const LAYOUT_ELEMENTS = [
@@ -484,9 +485,9 @@ function LayoutBuilder() {
   return (
     <div className="py-2">
       <CardHeader className="p-0 cursor-pointer" onClick={toggleOpen}>
-        <CardTitle className="text-xs font-normal flex items-center justify-between">
+        <CardTitle className="text-[11px] font-normal flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Layout className="w-4 h-4" />
+            {/* <Layout className="w-4 h-4" /> */}
             Layout
           </div>
           <div className="flex items-center gap-2">
@@ -512,7 +513,9 @@ function LayoutBuilder() {
           {/* Layout Type */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-xs font-medium text-gray-700">Type</Label>
+              <Label className="text-[11px] font-medium text-gray-700">
+                Type
+              </Label>
               {isDisplayInherited && (
                 <Button
                   variant="ghost"
@@ -566,7 +569,7 @@ function LayoutBuilder() {
           {isStack && (
             <>
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-gray-700">
+                <Label className="text-[11px] font-medium text-gray-700">
                   Direction
                 </Label>
                 <div className="flex gap-2">
@@ -601,7 +604,7 @@ function LayoutBuilder() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-gray-700">
+                <Label className="text-[11px] font-medium text-gray-700">
                   Distribute
                 </Label>
                 <Select
@@ -610,7 +613,7 @@ function LayoutBuilder() {
                     updateStyle("justifyContent", value)
                   }
                 >
-                  <SelectTrigger className="h-10 border-gray-200 text-xs">
+                  <SelectTrigger className="h-10 border-gray-200 text-[11px]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -625,7 +628,7 @@ function LayoutBuilder() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-gray-700">
+                <Label className="text-[11px] font-medium text-gray-700">
                   Align
                 </Label>
                 <div className="flex gap-2">
@@ -691,7 +694,7 @@ function LayoutBuilder() {
           {/* Grid Controls */}
           {isGrid && (
             <div className="space-y-2">
-              <Label className="text-xs font-medium text-gray-700">
+              <Label className="text-[11px] font-medium text-gray-700">
                 Columns
               </Label>
               <div className="grid grid-cols-2 gap-1 mb-2">
@@ -706,7 +709,7 @@ function LayoutBuilder() {
                     variant="outline"
                     size="sm"
                     className={cn(
-                      "h-10 text-xs",
+                      "h-10 text-[11px]",
                       computedStyles.gridTemplateColumns === opt.value
                         ? "border-[#FE784E] bg-orange-50 text-[#FE784E]"
                         : "border-gray-200 hover:border-gray-300"
@@ -725,7 +728,7 @@ function LayoutBuilder() {
                   updateStyle("gridTemplateColumns", e.target.value)
                 }
                 placeholder="1fr 1fr"
-                className="h-10 border-gray-200 text-xs"
+                className="h-10 border-gray-200 text-[11px]"
               />
             </div>
           )}
@@ -733,7 +736,9 @@ function LayoutBuilder() {
           {/* Gap Control */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-xs font-medium text-gray-700">Gap</Label>
+              <Label className="text-[11px] font-medium text-gray-700">
+                Gap
+              </Label>
               {isGapInherited && (
                 <Button
                   variant="ghost"
@@ -753,7 +758,7 @@ function LayoutBuilder() {
                 type="number"
                 step="1"
                 className={cn(
-                  "h-10 text-center w-20 text-xs",
+                  "h-10 text-center w-20 text-[11px]",
                   isGapInherited && "border-blue-300 border-dashed"
                 )}
               />
@@ -792,7 +797,7 @@ function CustomHtmlEditor({ selectedElement, updateContent }: any) {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-xs font-normal flex items-center gap-2">
+        <CardTitle className="text-[11px] font-normal flex items-center gap-2">
           <Code className="w-4 h-4" /> Custom HTML
         </CardTitle>
       </CardHeader>
@@ -915,7 +920,7 @@ function TypographyControls({
   return (
     <div className="py-2">
       <CardHeader className="p-0 cursor-pointer" onClick={toggleOpen}>
-        <CardTitle className="text-xs font-normal flex items-center justify-between">
+        <CardTitle className="text-[11px] font-normal flex items-center justify-between">
           <div className="flex items-center gap-2">
             {/* <Type className="w-4 h-4" /> */}
             Typography
@@ -1247,7 +1252,7 @@ function AdvancedSpacingControl({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <Label className="text-xs font-medium text-gray-700">{label}</Label>
+        <Label className="text-[11px] font-medium text-gray-700">{label}</Label>
         <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
           <Button
             variant={isLinked ? "default" : "ghost"}
@@ -1277,7 +1282,7 @@ function AdvancedSpacingControl({
             value={computedStyles[type] || "0px"}
             onChange={(e) => handleShorthandChange(e.target.value)}
             className={cn(
-              "text-xs h-9",
+              "text-[11px] h-9",
               isShorthandInherited() && "border-blue-300 border-dashed"
             )}
           />
@@ -1302,7 +1307,7 @@ function AdvancedSpacingControl({
                 value={getSideValue(side)}
                 onChange={(e) => handleIndividualChange(side, e.target.value)}
                 className={cn(
-                  "text-xs h-9 text-center",
+                  "text-[11px] h-9 text-center",
                   isSideInherited(side) && "border-blue-300 border-dashed"
                 )}
               />
@@ -1372,7 +1377,7 @@ function SpacingControls({ selectedElement, updateStyle }: any) {
   return (
     <div className="py-2">
       <CardHeader className="p-0 cursor-pointer" onClick={toggleOpen}>
-        <CardTitle className="text-xs font-normal flex items-center justify-between">
+        <CardTitle className="text-[11px] font-normal flex items-center justify-between">
           <div className="flex items-center gap-2">
             {/* <SpacingIcon className="w-4 h-4" /> */}
             Spacing
@@ -1452,7 +1457,7 @@ function ImageControl({ selectedElement, updateAttribute, updateStyle }: any) {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-xs font-normal flex items-center gap-2">
+        <CardTitle className="text-[11px] font-normal flex items-center gap-2">
           <ImageIcon className="w-4 h-4" /> Image Settings
         </CardTitle>
       </CardHeader>
@@ -1572,7 +1577,7 @@ function VideoControl({ selectedElement, updateAttribute }: any) {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-xs font-normal flex items-center gap-2">
+        <CardTitle className="text-[11px] font-normal flex items-center gap-2">
           <Video className="w-4 h-4" /> Video Settings
         </CardTitle>
       </CardHeader>
@@ -1605,7 +1610,10 @@ function VideoControl({ selectedElement, updateAttribute }: any) {
         <div className="space-y-3">
           {Object.entries(videoAttributes).map(([key, value]) => (
             <div key={key} className="flex items-center justify-between">
-              <Label htmlFor={`video-${key}`} className="text-xs capitalize">
+              <Label
+                htmlFor={`video-${key}`}
+                className="text-[11px] capitalize"
+              >
                 {key}
               </Label>
               <Switch
@@ -1915,7 +1923,7 @@ function ShadowsControl({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <Label className="text-xs font-medium text-gray-700">{label}</Label>
+        <Label className="text-[11px] font-medium text-gray-700">{label}</Label>
         <div className="flex items-center">
           {isInherited && (
             <Button
@@ -2140,7 +2148,7 @@ function AdvancedBorderControl({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <Label className="text-xs font-medium text-gray-700">Border</Label>
+        <Label className="text-[11px] font-medium text-gray-700">Border</Label>
         <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
           <Button
             variant={isLinked ? "default" : "ghost"}
@@ -2173,7 +2181,7 @@ function AdvancedBorderControl({
                 handleShorthandChange("borderWidth", e.target.value)
               }
               className={cn(
-                "text-xs h-9 w-1/3",
+                "text-[11px] h-9 w-1/3",
                 isShorthandInherited("borderWidth") &&
                   "border-blue-300 border-dashed"
               )}
@@ -2185,7 +2193,7 @@ function AdvancedBorderControl({
             >
               <SelectTrigger
                 className={cn(
-                  "text-xs h-9 w-1/3",
+                  "text-[11px] h-9 w-1/3",
                   isShorthandInherited("borderStyle") &&
                     "border-blue-300 border-dashed"
                 )}
@@ -2234,7 +2242,7 @@ function AdvancedBorderControl({
                     handleIndividualChange(side, "Width", e.target.value)
                   }
                   className={cn(
-                    "text-xs h-9 w-1/3",
+                    "text-[11px] h-9 w-1/3",
                     isSideInherited(side, "Width") &&
                       "border-blue-300 border-dashed"
                   )}
@@ -2248,7 +2256,7 @@ function AdvancedBorderControl({
                 >
                   <SelectTrigger
                     className={cn(
-                      "text-xs h-9 w-1/3",
+                      "text-[11px] h-9 w-1/3",
                       isSideInherited(side, "Style") &&
                         "border-blue-300 border-dashed"
                     )}
@@ -2341,7 +2349,7 @@ function AdvancedBorderRadiusControl({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <Label className="text-xs font-medium text-gray-700">
+        <Label className="text-[11px] font-medium text-gray-700">
           Border Radius
         </Label>
         <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
@@ -2372,7 +2380,7 @@ function AdvancedBorderRadiusControl({
             value={getShorthandValue()}
             onChange={(e) => handleShorthandChange(e.target.value)}
             className={cn(
-              "text-xs h-9",
+              "text-[11px] h-9",
               isShorthandInherited() && "border-blue-300 border-dashed"
             )}
           />
@@ -2400,7 +2408,7 @@ function AdvancedBorderRadiusControl({
                 value={getCornerValue(corner)}
                 onChange={(e) => handleIndividualChange(corner, e.target.value)}
                 className={cn(
-                  "text-xs h-9",
+                  "text-[11px] h-9",
                   isCornerInherited(corner) && "border-blue-300 border-dashed"
                 )}
               />
@@ -2556,7 +2564,7 @@ function FiltersControl({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <Label className="text-xs font-medium text-gray-700">Filters</Label>
+        <Label className="text-[11px] font-medium text-gray-700">Filters</Label>
         <div className="flex items-center">
           {isInherited && (
             <Button
@@ -2709,7 +2717,7 @@ function AppearanceControls({ selectedElement, updateStyle }: any) {
   return (
     <div className="py-2">
       <CardHeader className="p-0 cursor-pointer" onClick={toggleOpen}>
-        <CardTitle className="text-xs font-normal flex items-center justify-between">
+        <CardTitle className="text-[11px] font-normal flex items-center justify-between">
           <div className="flex items-center gap-2">
             {/* <Palette className="w-4 h-4" /> */}
             Appearance
@@ -2775,7 +2783,7 @@ function AppearanceControls({ selectedElement, updateStyle }: any) {
           />
 
           <div>
-            <Label className="text-xs font-medium text-gray-700 mb-2 block">
+            <Label className="text-[11px] font-medium text-gray-700 mb-2 block">
               Background Image
             </Label>
             <div className="space-y-2">
@@ -2845,7 +2853,7 @@ function AppearanceControls({ selectedElement, updateStyle }: any) {
           {/* Overflow Controls */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <Label className="text-xs font-medium text-gray-700">
+              <Label className="text-[11px] font-medium text-gray-700">
                 Overflow
               </Label>
             </div>
@@ -2963,7 +2971,7 @@ function SizeControls({
   return (
     <div className="py-2">
       <CardHeader className="p-0 cursor-pointer" onClick={toggleOpen}>
-        <CardTitle className="text-xs font-normal flex items-center justify-between">
+        <CardTitle className="text-[11px] font-normal flex items-center justify-between">
           <span className="flex items-center gap-1">Size</span>
           <div className="flex items-center gap-2">
             {hasSpecificStyles && (
@@ -3042,12 +3050,12 @@ export function StylesTab() {
 
   if (!state.selectedElement || !selectedElement) {
     return (
-      <div className="p-4">
+      <div className="p-4 ">
         <div className="text-center py-8">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className=" w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Palette className="w-8 h-8 text-gray-400" />
           </div>
-          <p className="text-xs text-gray-500 mb-2">No element selected</p>
+          <p className="text-[11px] text-gray-500 mb-2">No element selected</p>
           <p className="text-[10px] text-gray-400">
             Click on an element to start styling
           </p>
@@ -3150,23 +3158,23 @@ export function StylesTab() {
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-1 mb-4">
+      <div className="flex  mb-4 bg-[#F4F6F8]/50  p-1 rounded">
         <button
           onClick={() => setActiveTab("style")}
-          className={`px-4 py-2 text-xs rounded-md flex-1 ${
+          className={`px-4 py-2 text-[11px]  flex-1 ${
             activeTab === "style"
-              ? "bg-[#F4F6F8] text-black font-medium"
-              : "text-[#4F5C68] hover:bg-[#F4F6F8]/50"
+              ? "bg-white rounded text-black font-medium"
+              : "text-[#4F5C68] bg-[#F4F6F8]/50 "
           }`}
         >
           Style
         </button>
         <button
           onClick={() => setActiveTab("action")}
-          className={`px-4 py-2 text-xs rounded-md flex-1 ${
+          className={`px-4 py-2 text-[11px]  flex-1 ${
             activeTab === "action"
-              ? "bg-[#F4F6F8] text-black font-medium"
-              : "text-[#4F5C68] hover:bg-[#F4F6F8]/50"
+              ? "bg-white rounded text-black font-medium"
+              : "text-[#4F5C68] bg-[#F4F6F8]/50 "
           }`}
         >
           Action
@@ -3224,10 +3232,7 @@ export function StylesTab() {
             />
           </div>
         ) : (
-          <ActionControls
-            selectedElement={selectedElement}
-            updateAttribute={updateAttribute}
-          />
+          <InteractionsTab />
         )}
       </ScrollArea>
     </div>

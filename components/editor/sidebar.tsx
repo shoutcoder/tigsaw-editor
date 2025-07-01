@@ -24,7 +24,7 @@ interface SidebarProps {
 const tabConfig = [
   { value: "elements", label: "Add", icon: Plus },
   { value: "layers", label: "Layers", icon: Layers },
-  { value: "interactions", label: "Actions", icon: Zap },
+  // { value: "interactions", label: "Actions", icon: Zap },
   { value: "assets", label: "Assets", icon: ImageIcon },
   { value: "globaljs", label: "JS", icon: Code },
 ];
@@ -123,7 +123,7 @@ export function Sidebar({ isExpanded, onToggle }: SidebarProps) {
           <div className="flex-1 overflow-auto bg-white">
             {activeTab === "elements" && <ElementsTab />}
             {activeTab === "layers" && <LayersTab />}
-            {activeTab === "interactions" && <InteractionsTab />}
+            {/* {activeTab === "interactions" && <InteractionsTab />} */}
             {activeTab === "assets" && <AssetsTab />}
             {activeTab === "globaljs" && <GlobalJsTab />}
           </div>

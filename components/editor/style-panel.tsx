@@ -8,7 +8,7 @@ export function StylePanel() {
   const { state } = useEditor();
 
   return (
-    <div className="h-full overflow-y-auto  ">
+    <div className="h-full overflow-y-auto scrollbar-hide ">
       {state.selectedElement ? (
         <StylesTab />
       ) : (
