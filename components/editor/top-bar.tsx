@@ -5,6 +5,7 @@ import { useEditor } from "@/contexts/editor-context";
 import { useToast } from "@/hooks/use-toast";
 import { exportDesign } from "@/lib/export";
 import { cn } from "@/lib/utils";
+import { useEditorTemplateData } from "@/store/useEditorTemplateData";
 import {
   ArrowLeft,
   Download,
@@ -18,8 +19,10 @@ import {
   Smartphone,
   Tablet,
   TriangleAlert,
-  Undo
+  Undo,
+  CloudUploadIcon
 } from "lucide-react";
+// import CloudDoneIcon from "@/components/icons/cloud-done-icon";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -30,13 +33,15 @@ interface TopBarProps {
 
 export function TopBar({ setIsModalOpen, isModalOpen }: TopBarProps) {
   // export function TopBar() {
-  const searchParams = useSearchParams();
-  const templateId = searchParams.get("templateId") || ""; // Default to a specific template ID if not provided
+  // const searchParams = useSearchParams();
+  // const templateId = searchParams.get("templateId") || ""; // Default to a specific template ID if not provided
   const { state, dispatch } = useEditor();
   const { toast } = useToast();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [settingsConfigured, setSettingsConfigured] = useState(false);
+  const [settingsConfigured, setSettingsConfigured] = useState(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isAutoSaving, setSetAutoSaving] = useState(false);
+  const { templateName, id, setTemplateData,editableCode } = useEditorTemplateData();
 
   // Add keyboard shortcuts (copied from old Toolbar)
   useEffect(() => {
@@ -116,7 +121,7 @@ export function TopBar({ setIsModalOpen, isModalOpen }: TopBarProps) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            id: templateId,
+            id,
             editableCode: state.elements || [],
             js: state.globalJs || "",
             html: htmlString,
@@ -158,6 +163,62 @@ export function TopBar({ setIsModalOpen, isModalOpen }: TopBarProps) {
       setIsLoading(false);
     }
   };
+  const autoSave = async () => {
+     if(editableCode==state.elements) return;
+    setSetAutoSaving(true);
+    try {
+      const files = exportDesign(state.elements, state.globalJs);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(files[0].content, "text/html");
+      const body = doc.querySelector("body");
+      body?.querySelector("script")?.remove();
+      const css = files[1].content;
+      const htmlString = body ? body.outerHTML : "";
+      const res = await fetch(
+        "http://localhost:3000/api/templates/updateEditableCode",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id,
+            editableCode: state.elements || [],
+            js: state.globalJs || "",
+            html: htmlString,
+            css,
+          }),
+        }
+      );
+      if (!res.ok) {
+        console.error("Error in auto saving")
+        return;
+      }
+      const data = await res.json();
+      const elements: Element[] = Array.isArray(data.editableCode) ? data.editableCode : []
+      const globalJs: string = typeof data.js === 'string' ? data.js : ""
+      setTemplateData({
+        editableCode: elements,
+        js: globalJs,
+      })
+
+    } catch (err) {
+      console.error("Error in auto saving", err);
+    } finally {
+      setSetAutoSaving(false);
+    }
+
+  }
+  useEffect(() => {
+    // if (!settingsConfigured || !id) return;
+    if (!id) return;
+
+    const debounce = setTimeout(() => {
+      autoSave();
+    }, 3000); // Auto-save after 1.5s of inactivity
+
+    return () => clearTimeout(debounce);
+  }, [state.elements, state.globalJs]);
 
   const canUndo = state.historyIndex > 0;
   const canRedo = state.historyIndex < state.history.length - 1;
@@ -175,8 +236,20 @@ export function TopBar({ setIsModalOpen, isModalOpen }: TopBarProps) {
         </Button>
 
         <p className="border border-[rgba(0,0,0,0.1)] text-sm  py-1 px-2 font-semibold rounded-md">
-          Demo Widgets
+          {templateName}
         </p>
+        {isAutoSaving ? (
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 border-2 border-gray-300 border-t-green-500 animate-spin rounded-full" />
+            <p className="text-xs text-green-600">Saving...</p>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1">
+            <CloudUploadIcon className="w-4 h-4 text-black/70 dark:text-white/70" />
+            <p className="text-xs text-black/70 dark:text-white/70">Auto save</p>
+          </div>
+        )}
+
         {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="h-8 px-2">

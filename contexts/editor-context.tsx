@@ -1,5 +1,6 @@
 "use client";
 
+import { useEditorTemplateData } from "@/store/useEditorTemplateData";
 import type React from "react";
 import { createContext, useContext, useEffect, useReducer, useState, type ReactNode } from "react";
 
@@ -731,6 +732,7 @@ export function EditorProvider({ children,templateId }: { children: ReactNode;te
   const [state, dispatch] = useReducer(editorReducer, initialState);
   const [isInitialized, setIsInitialized] = useState(false)
   const [isFetching, setIsFetching] = useState(true)
+  const {setTemplateData}=useEditorTemplateData()
 
 useEffect(() => {
     const initializeEditor = async () => {
@@ -742,7 +744,15 @@ useEffect(() => {
         console.log("Data api", data)
         const elements: Element[] = Array.isArray(data.editableCode) ? data.editableCode : []
         const globalJs: string = typeof data.js === 'string' ? data.js : ""
-        
+         setTemplateData({
+          id: data.id,
+          templateName: data.templateName,
+          templateURL: data.templateURL,
+          js: globalJs,
+          locationType: data.locationType,
+          deviceType: data.deviceType,
+          editableCode:elements
+        });
         // const {editableCode:Element[]} = data
         dispatch({
           type: "INITIALIZE_STATE",
