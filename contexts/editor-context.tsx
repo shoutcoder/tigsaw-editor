@@ -1,6 +1,5 @@
 "use client";
 
-import { useSearchParams } from 'next/navigation';
 import type React from "react";
 import { createContext, useContext, useEffect, useReducer, useState, type ReactNode } from "react";
 
@@ -728,15 +727,15 @@ const EditorContext = createContext<{
   dispatch: React.Dispatch<EditorAction>;
 } | null>(null);
 
-export function EditorProvider({ children }: { children: ReactNode }) {
+export function EditorProvider({ children,templateId }: { children: ReactNode;templateId:string }) {
   const [state, dispatch] = useReducer(editorReducer, initialState);
-    const searchParams = useSearchParams();
-  const templateId = searchParams.get('templateId') || ''; // Default to a specific template ID if not provided
   const [isInitialized, setIsInitialized] = useState(false)
+  const [isFetching, setIsFetching] = useState(true)
 
 useEffect(() => {
     const initializeEditor = async () => {
       try {
+        setIsFetching(true);
         // Your direct API call approach
         const res = await fetch(`http://localhost:3000/api/templates/${templateId}`)
         const data = await res.json()
@@ -763,11 +762,14 @@ useEffect(() => {
         console.error("Failed to initialize editor:", error)
         setIsInitialized(true) // Still mark as initialized to show the empty state
       }
+      finally {
+        setIsFetching(false);
+      }
     }
 
     initializeEditor()
   }, [])
-  if (!isInitialized) {
+  if (isFetching) {
     return (
       <div style={{ 
         display: 'flex', 
