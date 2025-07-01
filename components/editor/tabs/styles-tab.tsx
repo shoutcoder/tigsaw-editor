@@ -917,7 +917,7 @@ function TypographyControls({
       <CardHeader className="p-0 cursor-pointer" onClick={toggleOpen}>
         <CardTitle className="text-xs font-normal flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Type className="w-4 h-4" />
+            {/* <Type className="w-4 h-4" /> */}
             Typography
           </div>
           <div className="flex items-center gap-2">
