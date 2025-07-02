@@ -20,7 +20,7 @@ import {
   Tablet,
   TriangleAlert,
   Undo,
-  CloudUploadIcon
+  CloudUploadIcon,
 } from "lucide-react";
 // import CloudDoneIcon from "@/components/icons/cloud-done-icon";
 import { useSearchParams } from "next/navigation";
@@ -29,19 +29,23 @@ import { useEffect, useState } from "react";
 interface TopBarProps {
   setIsModalOpen: (open: boolean) => void;
   isModalOpen: boolean;
+  settingsConfigured: boolean;
 }
 
-export function TopBar({ setIsModalOpen, isModalOpen }: TopBarProps) {
+export function TopBar({
+  setIsModalOpen,
+  isModalOpen,
+  settingsConfigured,
+}: TopBarProps) {
   // export function TopBar() {
   // const searchParams = useSearchParams();
   // const templateId = searchParams.get("templateId") || ""; // Default to a specific template ID if not provided
   const { state, dispatch } = useEditor();
   const { toast } = useToast();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [settingsConfigured, setSettingsConfigured] = useState(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAutoSaving, setSetAutoSaving] = useState(false);
-  const { templateName, id, setTemplateData,editableCode } = useEditorTemplateData();
+  const { templateName, id, setTemplateData, editableCode } =
+    useEditorTemplateData();
 
   // Add keyboard shortcuts (copied from old Toolbar)
   useEffect(() => {
@@ -164,7 +168,7 @@ export function TopBar({ setIsModalOpen, isModalOpen }: TopBarProps) {
     }
   };
   const autoSave = async () => {
-     if(editableCode==state.elements) return;
+    if (editableCode == state.elements) return;
     setSetAutoSaving(true);
     try {
       const files = exportDesign(state.elements, state.globalJs);
@@ -191,24 +195,24 @@ export function TopBar({ setIsModalOpen, isModalOpen }: TopBarProps) {
         }
       );
       if (!res.ok) {
-        console.error("Error in auto saving")
+        console.error("Error in auto saving");
         return;
       }
       const data = await res.json();
-      const elements: Element[] = Array.isArray(data.editableCode) ? data.editableCode : []
-      const globalJs: string = typeof data.js === 'string' ? data.js : ""
+      const elements: Element[] = Array.isArray(data.editableCode)
+        ? data.editableCode
+        : [];
+      const globalJs: string = typeof data.js === "string" ? data.js : "";
       setTemplateData({
         editableCode: elements,
         js: globalJs,
-      })
-
+      });
     } catch (err) {
       console.error("Error in auto saving", err);
     } finally {
       setSetAutoSaving(false);
     }
-
-  }
+  };
   useEffect(() => {
     // if (!settingsConfigured || !id) return;
     if (!id) return;
@@ -246,7 +250,9 @@ export function TopBar({ setIsModalOpen, isModalOpen }: TopBarProps) {
         ) : (
           <div className="flex items-center gap-1">
             <CloudUploadIcon className="w-4 h-4 text-black/70 dark:text-white/70" />
-            <p className="text-xs text-black/70 dark:text-white/70">Auto save</p>
+            <p className="text-xs text-black/70 dark:text-white/70">
+              Auto save
+            </p>
           </div>
         )}
 

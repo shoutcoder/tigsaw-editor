@@ -15,7 +15,8 @@ export function EditorLayout() {
   const [isLeftPanelExpanded, setIsLeftPanelExpanded] = useState(true);
   const [leftSidebarWidth, setLeftSidebarWidth] = useState(320);
   const [rightSidebarWidth, setRightSidebarWidth] = useState(320);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [settingsConfigured, setSettingsConfigured] = useState(false);
 
   // Constants
   const COLLAPSED_WIDTH = 80;
@@ -86,7 +87,11 @@ export function EditorLayout() {
     <div className="flex flex-col h-screen bg-[#F0F0F0] text-gray-900">
       {/* TopBar with button */}
 
-      <TopBar setIsModalOpen={setIsModalOpen} isModalOpen={isModalOpen} />
+      <TopBar
+        setIsModalOpen={setIsModalOpen}
+        isModalOpen={isModalOpen}
+        settingsConfigured={settingsConfigured}
+      />
 
       {/* Main editor layout */}
       <div className="flex flex-1 overflow-hidden mb-3">
@@ -142,6 +147,7 @@ export function EditorLayout() {
           {/* 🔥 Modal covers Canvas + StylePanel */}
           <SettingsModal
             open={isModalOpen}
+            setSettingsConfigured={setSettingsConfigured}
             onClose={() => setIsModalOpen(false)}
           />
         </div>
