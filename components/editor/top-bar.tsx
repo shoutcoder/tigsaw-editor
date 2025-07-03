@@ -21,10 +21,17 @@ import {
   TriangleAlert,
   Undo,
   CloudUploadIcon,
+  EyeOff,
 } from "lucide-react";
 // import CloudDoneIcon from "@/components/icons/cloud-done-icon";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 interface TopBarProps {
   setIsModalOpen: (open: boolean) => void;
@@ -315,40 +322,42 @@ export function TopBar({
         </div>
 
         <div className="flex items-center space-x-1">
-          <div className="flex items-center space-x-0.5 bg-gray-100 rounded-md p-0.5">
-            <Button
-              variant={state.editingMode === "editing" ? "default" : "ghost"}
-              size="sm"
-              className="h-7 px-3 text-xs"
-              onClick={() => {
-                console.log("🔧 Switching to editing mode");
-                dispatch({
-                  type: "SET_EDITING_MODE",
-                  payload: { mode: "editing" },
-                });
-              }}
-              title="Editing Mode (Ctrl+E)"
-            >
-              <Edit3 className="w-3.5 h-3.5 mr-1" />
-              Edit
-            </Button>
-            <Button
-              variant={state.editingMode === "browsing" ? "default" : "ghost"}
-              size="sm"
-              className="h-7 px-3 text-xs"
-              onClick={() => {
-                console.log("🌐 Switching to browsing mode");
-                dispatch({
-                  type: "SET_EDITING_MODE",
-                  payload: { mode: "browsing" },
-                });
-              }}
-              title="Browsing Mode (Ctrl+E)"
-            >
-              <MousePointer className="w-3.5 h-3.5 mr-1" />
-              Browse
-            </Button>
-          </div>
+          {!state.isPreviewMode && (
+            <div className="flex items-center space-x-0.5 bg-gray-100 rounded-md p-0.5">
+              <Button
+                variant={state.editingMode === "editing" ? "default" : "ghost"}
+                size="sm"
+                className="h-7 px-3 text-xs"
+                onClick={() => {
+                  console.log("🔧 Switching to editing mode");
+                  dispatch({
+                    type: "SET_EDITING_MODE",
+                    payload: { mode: "editing" },
+                  });
+                }}
+                title="Editing Mode (Ctrl+E)"
+              >
+                <Edit3 className="w-3.5 h-3.5 mr-1" />
+                Edit
+              </Button>
+              <Button
+                variant={state.editingMode === "browsing" ? "default" : "ghost"}
+                size="sm"
+                className="h-7 px-3 text-xs"
+                onClick={() => {
+                  console.log("🌐 Switching to browsing mode");
+                  dispatch({
+                    type: "SET_EDITING_MODE",
+                    payload: { mode: "browsing" },
+                  });
+                }}
+                title="Browsing Mode (Ctrl+E)"
+              >
+                <MousePointer className="w-3.5 h-3.5 mr-1" />
+                Browse
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-row gap-3 items-center">
@@ -402,10 +411,30 @@ export function TopBar({
             variant="ghost"
             size="sm"
             className="h-7 px-2 text-xs text-gray-600 hover:text-gray-900"
-            onClick={() => dispatch({ type: "TOGGLE_PREVIEW" })}
+            onClick={() => {
+              dispatch({ type: "TOGGLE_PREVIEW" });
+              !state.isPreviewMode &&
+                state.editingMode === "editing" &&
+                dispatch({
+                  type: "SET_EDITING_MODE",
+                  payload: { mode: "browsing" },
+                });
+
+              state.isPreviewMode &&
+                state.editingMode === "browsing" &&
+                dispatch({
+                  type: "SET_EDITING_MODE",
+                  payload: { mode: "editing" },
+                });
+            }}
           >
-            <Eye className="w-3.5 h-3.5 mr-1" />
-            {state.isPreviewMode ? "Editing" : "Preview"}
+            {state.isPreviewMode ? (
+              <EyeOff className="w-3.5 h-3.5 mr-1" />
+            ) : (
+              <Eye className="w-3.5 h-3.5 mr-1" />
+            )}
+            {/* {state.isPreviewMode ? "Editing" : "Preview"} */}
+            Preview
           </Button>
         </div>
         {/* Right Section - View & Export */}
@@ -430,27 +459,54 @@ export function TopBar({
             >
               <Settings className="w-5 h-5" />
             </Button> */}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className={
+                      isLoading || !settingsConfigured
+                        ? "cursor-not-allowed"
+                        : ""
+                    }
+                  >
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="h-7 px-6 text-xs"
+                      onClick={handleExport}
+                      disabled={isLoading || !settingsConfigured}
+                    >
+                      {isLoading ? (
+                        <>
+                          <div className="w-3.5 h-3.5 mr-1 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+                          Publishing...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="w-3.5 h-3.5 mr-1" />
+                          Publish
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </TooltipTrigger>
 
-            <Button
-              variant="outline"
-              size="lg"
-              className="h-7 px-6 text-xs"
-              onClick={handleExport}
-              disabled={isLoading || !settingsConfigured}
-            >
-              {/* > */}
-              {isLoading ? (
-                <>
-                  <div className="w-3.5 h-3.5 mr-1 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
-                  Publishing...
-                </>
-              ) : (
-                <>
-                  <Download className="w-3.5 h-3.5 mr-1" />
-                  Publish
-                </>
-              )}
-            </Button>
+                {(isLoading || !settingsConfigured) && (
+                  <TooltipContent
+                    side="top"
+                    align="start"
+                    sideOffset={5}
+                    className="max-w-xs mr-2 rounded-md bg-gray-800 text-white text-xs px-3 py-2 shadow-lg border border-gray-700"
+                  >
+                    <p className="leading-snug text-center">
+                      {isLoading
+                        ? "Please wait while we publish your content."
+                        : "You must configure your settings before publishing."}
+                    </p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </div>

@@ -2,8 +2,9 @@
 
 import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Lock, MinusCircle } from "lucide-react";
+import { PlusCircle, MinusCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Country, CountryDropdown } from "./countrySelector";
 
 export function SettingsModal({
   open,
@@ -27,7 +28,6 @@ export function SettingsModal({
   const [excludePages, setExcludePages] = useState<
     { matchType: string; url: string }[]
   >([]);
-  const [showExclude, setShowExclude] = useState(false);
 
   const [errors, setErrors] = useState<{
     include?: number[];
@@ -36,6 +36,7 @@ export function SettingsModal({
 
   const editorUrlRef = useRef<HTMLInputElement | null>(null);
   const locationRef = useRef<HTMLSelectElement | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
 
   useEffect(() => {
     if (editorUrlRef.current) {
@@ -132,7 +133,13 @@ export function SettingsModal({
       selectedOS,
       locationType,
       customLocation:
-        locationType === "custom" ? locationRef.current?.value : null,
+        locationType === "custom" && selectedCountry
+          ? selectedCountry.alpha2
+          : null,
+      countryName:
+        locationType === "custom" && selectedCountry
+          ? selectedCountry.name
+          : null,
     };
 
     console.log("✅ Final config:", data);
@@ -185,6 +192,17 @@ export function SettingsModal({
               handleChange
             )}
 
+            {/* Exclude Section */}
+            {excludePages.length > 0 &&
+              renderPageFields(
+                "exclude",
+                excludePages,
+                errors.exclude,
+                handleAddField,
+                handleRemoveField,
+                handleChange
+              )}
+
             {/* Buttons */}
             <div className="flex items-center gap-8 mt-4">
               <button
@@ -198,27 +216,13 @@ export function SettingsModal({
 
               <button
                 type="button"
-                onClick={() => {
-                  setShowExclude(true);
-                  handleAddField("exclude"); // Always add one
-                }}
+                onClick={() => handleAddField("exclude")}
                 className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span>Exclude pages</span>
               </button>
             </div>
-
-            {/* Exclude Section */}
-            {showExclude &&
-              renderPageFields(
-                "exclude",
-                excludePages,
-                errors.exclude,
-                handleAddField,
-                handleRemoveField,
-                handleChange
-              )}
           </div>
 
           {/* Right Side */}
@@ -340,21 +344,14 @@ export function SettingsModal({
                 </label>
               </div>
               {locationType === "custom" && (
-                <div className="mt-2">
-                  <label className="block text-xs text-gray-500 mb-1">
+                <div className="mt-2 space-y-2">
+                  <label className="block text-xs text-gray-500">
                     Select Country
                   </label>
-                  <select
-                    ref={locationRef}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none"
-                  >
-                    <option>United States</option>
-                    <option>Canada</option>
-                    <option>United Kingdom</option>
-                    <option>Australia</option>
-                    <option>Germany</option>
-                    <option>France</option>
-                  </select>
+                  <CountryDropdown
+                    onChange={(country) => setSelectedCountry(country)}
+                    placeholder="Choose a country"
+                  />
                 </div>
               )}
             </div>
@@ -374,7 +371,7 @@ export function SettingsModal({
   );
 }
 
-// Render Fields (for include & exclude)
+// 🔄 Renders page field blocks for both Include and Exclude
 function renderPageFields(
   type: "include" | "exclude",
   fields: { matchType: string; url: string }[],
@@ -387,10 +384,9 @@ function renderPageFields(
 
   return (
     <div className="mt-6">
-      {/* 🚫 Show label only for include */}
-      {isInclude && (
+      {(isInclude || fields.length > 0) && (
         <label className="block text-sm font-medium text-gray-900 mb-4">
-          Include pages where
+          {isInclude ? "Include pages where" : "Exclude pages where"}
         </label>
       )}
 
@@ -422,7 +418,6 @@ function renderPageFields(
                     : "border-gray-300"
                 } rounded-md bg-white text-sm focus:outline-none`}
               />
-              {/* Show remove button */}
               {(isInclude ? fields.length > 1 : true) && (
                 <MinusCircle
                   onClick={() => handleRemove(type, index)}
@@ -443,7 +438,6 @@ function renderPageFields(
   );
 }
 
-// Reuse for Devices, Browser, OS, etc.
 function DeviceCheckboxGroup({
   label,
   values,
