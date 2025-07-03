@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useRef } from "react"
+import { useRef,useState,useEffect } from "react"
 import { useEditor, findElementById } from "@/contexts/editor-context"
 import type { Asset } from "@/contexts/editor-context"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -10,9 +10,35 @@ import { Button } from "@/components/ui/button"
 import { Upload, Trash2, ImageIcon, Video } from "lucide-react"
 import { generateId } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
+import { toast } from "sonner"
+const allowedTypes = [
+      // Image formats
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/svg+xml",
+      "image/bmp",
+      "image/tiff",
+
+      // Video formats
+      "video/mp4",
+      "video/mpeg",
+      "video/quicktime",
+      "video/x-msvideo",
+      "video/x-ms-wmv",
+      "video/webm",
+      "video/ogg",
+      "video/x-flv",
+      "video/3gpp",
+      "video/3gpp2",
+    ];
 
 export function AssetsTab() {
   const { state, dispatch } = useEditor()
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [result, setResult] = useState<string>('');
+
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleUploadClick = () => {
@@ -21,24 +47,72 @@ export function AssetsTab() {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
+    console.log("🤖🤖File selected:", file)
     if (!file) return
-
     const fileType = file.type.startsWith("image/") ? "image" : file.type.startsWith("video/") ? "video" : null
-
+    console.log("Step-1")
     if (!fileType) {
       // Optionally, show a toast notification for unsupported file types
       console.error("Unsupported file type:", file.type)
       return
     }
+    console.log("Step-2")
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    console.log("Step-3")
+    reader.onload = async () => {
+      const base64Data = reader.result?.toString().split(",")[1];
+      
+      console.log("Step-4")
+      if (!base64Data){
+        toast.error( "Error reading file");
+        return; 
+      }
+      console.log("Step-5")
+      const response = await fetch("http://localhost:3000/api/uploadMedia", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({  
+          fileName: file.name,
+          fileType: file.type,
+          fileData: base64Data,
+        }),
+      });
 
-    const newAsset: Asset = {
-      id: generateId(),
-      name: file.name,
-      url: URL.createObjectURL(file),
-      type: fileType,
-    }
+    
+      const result = await response.json();
+      console.log("result",result)
+      setResult(result.key)
 
-    dispatch({ type: "ADD_ASSET", payload: { asset: newAsset } })
+      setIsLoading(false);
+      if (!response.ok) {
+        toast(`${ result.message || "Upload error."}`);
+      } else {
+        // onClose();
+        // onUploadComplete();
+      }
+      
+      const newAsset: Asset = {
+        id: generateId(),
+        name: file.name,
+        url: result.key, // ✅ Set correct uploaded URL
+        type: fileType,
+      };
+
+      dispatch({ type: "ADD_ASSET", payload: { asset: newAsset } });
+      toast.success("Upload successful!");
+    };
+
+
+    // const newAsset: Asset = {
+    //   id: generateId(),
+    //   name: file.name,
+    //   url: result,
+    //   type: fileType,
+    // }
+    // console.log("🤖🤖New asset created:", newAsset)
+
+    // dispatch({ type: "ADD_ASSET", payload: { asset: newAsset } })
   }
 
   const handleAssetSelect = (asset: Asset) => {
